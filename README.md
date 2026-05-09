@@ -1,5 +1,7 @@
 # 💻 Terminal Portfolio
 
+> 🌐 **English** · [Français](README.fr.md) · [Español](README.es.md)
+
 An interactive terminal-style portfolio with AI-powered Q&A, multilingual support, and Docker-first deployment.
 
 ## 📸 Screenshots
