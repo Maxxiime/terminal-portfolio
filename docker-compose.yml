@@ -12,7 +12,5 @@ services:
     dns:
       - 1.1.1.1
       - 8.8.8.8
-    security_opt:
-      - apparmor=unconfined
     ports:
       - ${PORT:-3012}:80

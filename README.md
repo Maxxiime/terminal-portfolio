@@ -1,34 +1,31 @@
-# Terminal Portfolio
+# 💻 Terminal Portfolio
 
-Interactive terminal-style portfolio built with React + Vite, served via nginx in Docker.
-The `question` command proxies AI responses through OpenRouter.
+An interactive terminal-style portfolio with AI-powered Q&A, multilingual support, and Docker-first deployment.
 
-## About
+## ✨ Features
 
-Interactive terminal-style portfolio with AI-powered Q&A, multilingual support, and Docker-first deployment.
+- 🤖 **AI Q&A** — `question` command answers natural-language questions about the CV, proxied through OpenRouter directly from nginx (no backend server)
+- 🌍 **Multilingual** — full FR / EN / ES interface with locale-aware AI responses and a `language` command to switch at runtime
+- 🎬 **Animated boot sequence** — typed startup lines with per-character timing before the terminal becomes interactive
+- 🔗 **Clickable links** — URLs in command output and AI responses are automatically rendered as styled, theme-aware links
+- 📄 **In-terminal CV access** — `gui` command opens the CV PDF served directly from the container
+- 😄 **Randomized unknown-command responses** — sysadmin/Linux jokes instead of a plain "command not found"
+- 📜 **Smart auto-scroll** — MutationObserver-based scroll that follows new output while respecting intentional upward scrolling
+- ⚡ **PWA routing** — service worker exempts `/health` and `/cv/` from SPA fallback so static endpoints work through a reverse proxy
+- 🐳 **Docker-first deployment** — nginx:alpine runtime with OpenRouter reverse proxy, health endpoint generated at container startup, and a single `deploy.sh` workflow
 
-### Features
+## 🛠 Stack
 
-- **Animated boot sequence** — typed startup lines with per-character timing and loading dots before the terminal becomes interactive
-- **AI-powered `question` command** — asks questions about the CV in natural language, proxied through OpenRouter's free model pool directly from nginx (no backend server)
-- **Multilingual support** — full FR / EN / ES interface with locale-aware AI responses and a `language` command to switch at runtime
-- **Clickable terminal links** — URLs in command output and AI responses are automatically detected and rendered as styled, theme-aware links
-- **In-terminal CV access** — `gui` command opens the CV PDF served directly from the container (`/cv/`)
-- **Randomized unknown-command responses** — sysadmin/Linux jokes instead of a plain "command not found"
-- **Improved auto-scroll** — MutationObserver-based scroll that follows new output while respecting intentional upward scrolling
-- **PWA routing fix** — service worker configured to exempt `/health` and `/cv/` from SPA fallback so static endpoints work through a reverse proxy
-- **Docker-first deployment** — nginx:alpine runtime with OpenRouter reverse proxy, health endpoint generated at container startup, and a single `deploy.sh` workflow
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18, TypeScript, Vite, styled-components |
+| Runtime | nginx:alpine (SPA routing + OpenRouter proxy) |
+| Deploy | Docker + Docker Compose |
 
-## Stack
-
-- **Frontend** — React 18, TypeScript, Vite, styled-components
-- **Runtime** — nginx:alpine (handles SPA routing + OpenRouter proxy)
-- **Deploy** — Docker + Docker Compose
-
-## Structure
+## 📁 Structure
 
 ```
-├── src/              # React/Vite source (edit profile, commands, styles here)
+├── src/              # React/Vite source
 │   ├── src/
 │   │   ├── components/
 │   │   ├── data/profile.ts   ← all personal content lives here
@@ -46,7 +43,7 @@ Interactive terminal-style portfolio with AI-powered Q&A, multilingual support, 
 └── .env.example
 ```
 
-## Setup
+## 🚀 Setup
 
 ```bash
 # 1. Clone
@@ -63,16 +60,16 @@ cp .env.example .env
 
 The portfolio is available at `http://localhost:3012` (or your configured PORT).
 
-## Environment variables
+## 🔑 Environment variables
 
-| Variable             | Description                         | Required |
-|----------------------|-------------------------------------|----------|
+| Variable             | Description                          | Required |
+|----------------------|--------------------------------------|----------|
 | `OPENROUTER_API_KEY` | OpenRouter API key (free tier works) | Yes      |
 | `PORT`               | Host port (default: `3012`)          | No       |
 
 Get a free key at [openrouter.ai/keys](https://openrouter.ai/keys).
 
-## Development
+## 🧑‍💻 Development
 
 ```bash
 cd src
@@ -83,7 +80,7 @@ npm run test      # run tests
 npm run lint      # lint
 ```
 
-## Manual deploy (without deploy.sh)
+## 📦 Manual deploy (without deploy.sh)
 
 ```bash
 # 1. Build
@@ -97,25 +94,24 @@ docker compose down
 docker compose up -d --build
 ```
 
-## Endpoints
+## 🌐 Endpoints
 
-| Path                          | Description                    |
-|-------------------------------|--------------------------------|
-| `/`                           | Terminal portfolio SPA         |
-| `/health`                     | Health check JSON              |
-| `/cv/resume.pdf`              | CV PDF                         |
-| `/api/question`               | OpenRouter proxy (POST)        |
+| Path              | Description             |
+|-------------------|-------------------------|
+| `/`               | Terminal portfolio SPA  |
+| `/health`         | Health check JSON       |
+| `/cv/resume.pdf`  | CV PDF                  |
+| `/api/question`   | OpenRouter proxy (POST) |
 
-## Customizing content
+## ✏️ Customizing content
 
-All personal content is in [`src/src/data/profile.ts`](src/src/data/profile.ts).
+All personal content is in [`src/src/data/profile.ts`](src/src/data/profile.ts).  
 UI strings (3 languages) are in [`src/src/i18n.ts`](src/src/i18n.ts).
 
-To replace the CV: drop your PDF in `src/public/cv/` and update `cvUrl` in `profile.ts`.
+To replace the CV: drop your PDF in `src/public/cv/` as `resume.pdf` and update `cvUrl` in `profile.ts`.
 
-## Reverse proxy (nginx / NPM)
+## 🔄 Reverse proxy (nginx / NPM)
 
-If you use a reverse proxy, make sure it forwards requests as-is — the nginx config
-inside the container handles SPA routing and static file serving directly.
+If you use a reverse proxy, make sure it forwards requests as-is — the nginx config inside the container handles SPA routing and static file serving directly.
 
 The service worker (PWA) exempts `/health` and `/cv/` from SPA fallback automatically.
