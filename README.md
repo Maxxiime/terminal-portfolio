@@ -2,6 +2,21 @@
 
 An interactive terminal-style portfolio with AI-powered Q&A, multilingual support, and Docker-first deployment.
 
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td align="center"><b>Boot sequence</b></td>
+    <td align="center"><b>Help</b></td>
+    <td align="center"><b>AI Q&A</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/boot.png" alt="Boot sequence" width="380"/></td>
+    <td><img src="docs/screenshots/help.png" alt="Help command" width="380"/></td>
+    <td><img src="docs/screenshots/question.png" alt="AI question" width="380"/></td>
+  </tr>
+</table>
+
 ## ✨ Features
 
 - 🤖 **AI Q&A** — `question` command answers natural-language questions about the CV, proxied through OpenRouter directly from nginx (no backend server)
