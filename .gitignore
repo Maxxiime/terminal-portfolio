@@ -1,0 +1,19 @@
+# Env
+.env
+
+# Frontend build output
+src/dist/
+src/dist-ssr/
+src/node_modules/
+
+# Runtime built assets (populated by deploy.sh)
+runtime/dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea

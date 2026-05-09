@@ -1,0 +1,18 @@
+services:
+  portfolio-terminal:
+    build:
+      context: ./runtime
+    image: terminal-portfolio:latest
+    container_name: terminal-portfolio
+    restart: unless-stopped
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - NODE_OPTIONS=--dns-result-order=ipv4first
+      - DNS_RESULT_ORDER=ipv4first
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    security_opt:
+      - apparmor=unconfined
+    ports:
+      - ${PORT:-3012}:80

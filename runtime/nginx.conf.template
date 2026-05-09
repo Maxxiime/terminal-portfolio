@@ -1,0 +1,64 @@
+map $request_uri $log_question_api {
+  default 0;
+  ~^/api/question$ 1;
+}
+
+log_format question_api '$time_local rid="$http_x_request_id" src="$http_x_request_source" model="$http_x_request_model" req="$request" status=$status upstream_status=$upstream_status upstream_addr="$upstream_addr" rt=$request_time urt=$upstream_response_time bytes=$request_length';
+
+server {
+  listen 80;
+  server_name _;
+  root /usr/share/nginx/html;
+  index index.html;
+  resolver 1.1.1.1 8.8.8.8 ipv6=off valid=300s;
+  resolver_timeout 5s;
+  access_log /dev/stdout question_api if=$log_question_api;
+
+  set $openrouter_api_host openrouter.ai;
+
+  location = /api/question {
+    proxy_pass https://$openrouter_api_host/api/v1/chat/completions;
+    proxy_http_version 1.1;
+    proxy_set_header Host $openrouter_api_host;
+    proxy_ssl_server_name on;
+    proxy_ssl_name $openrouter_api_host;
+    proxy_set_header Content-Type "application/json";
+    proxy_set_header Authorization "Bearer ${OPENROUTER_API_KEY}";
+    proxy_set_header HTTP-Referer "https://portfolio2.maxime-lemenand.com";
+    proxy_set_header X-Title "Maxime Lemenand Terminal Portfolio";
+    proxy_set_header X-Request-Id $http_x_request_id;
+    proxy_set_header X-Request-Source $http_x_request_source;
+    proxy_set_header X-Request-Model $http_x_request_model;
+    proxy_set_header X-Request-Payload-Bytes $http_x_request_payload_bytes;
+    proxy_set_header Origin "";
+    proxy_set_header Referer "";
+    proxy_set_header Sec-Fetch-Site "";
+    proxy_set_header Sec-Fetch-Mode "";
+    proxy_set_header Sec-Fetch-Dest "";
+    proxy_read_timeout 90s;
+    proxy_connect_timeout 15s;
+    proxy_send_timeout 90s;
+  }
+
+  location = /health {
+    alias /usr/share/nginx/html/health.json;
+    default_type application/json;
+    add_header Cache-Control "no-store";
+  }
+
+  location = /manifest.webmanifest {
+    return 301 /site.webmanifest;
+  }
+
+  location ^~ /cv/ {
+    try_files $uri =404;
+  }
+
+  location ~* \.(?:png|jpg|jpeg|gif|webp|svg|ico|pdf)$ {
+    try_files $uri =404;
+  }
+
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+}
