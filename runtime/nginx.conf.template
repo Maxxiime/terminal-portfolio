@@ -24,7 +24,7 @@ server {
     proxy_ssl_name $openrouter_api_host;
     proxy_set_header Content-Type "application/json";
     proxy_set_header Authorization "Bearer ${OPENROUTER_API_KEY}";
-    proxy_set_header HTTP-Referer "https://portfolio2.maxime-lemenand.com";
+    proxy_set_header HTTP-Referer "https://maxime-lemenand.com";
     proxy_set_header X-Title "Maxime Lemenand Terminal Portfolio";
     proxy_set_header X-Request-Id $http_x_request_id;
     proxy_set_header X-Request-Source $http_x_request_source;
