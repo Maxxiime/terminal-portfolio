@@ -1,10 +1,41 @@
 import { useContext, useEffect, useMemo, useState } from "react";
-import { termContext } from "../Terminal";
-import { getPortfolioKnowledgeBase } from "../../data/profile";
+import styled from "styled-components";
+import { termContext, terminalActionsContext } from "../Terminal";
+import { getPortfolioKnowledgeBase, profile } from "../../data/profile";
 import { Wrapper } from "../styles/Output.styled";
 import { languageContext } from "../../App";
 import { answerLanguageNames, uiText } from "../../i18n";
 import LinkifiedText from "../LinkifiedText";
+
+const UsageHint = styled.span`
+  color: ${({ theme }) => theme.colors?.secondary};
+`;
+
+const ExampleList = styled.div`
+  margin-top: 0.4rem;
+`;
+
+const ExampleItem = styled.div`
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors?.primary};
+  margin-top: 0.25rem;
+  display: flex;
+  width: fit-content;
+  align-items: baseline;
+  gap: 0.35rem;
+
+  &::before {
+    content: "↗";
+    font-size: 0.72em;
+    opacity: 0.7;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+`;
 
 type QaState =
   | { status: "idle" | "loading"; answer: string }
@@ -16,8 +47,7 @@ const spinnerFrames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "
 
 const getCompactPortfolioContext = (locale: "fr" | "en" | "es") =>
   getPortfolioKnowledgeBase(locale)
-    .replace(/\n{3,}/g, "\n\n")
-    .slice(0, 1600);
+    .replace(/\n{3,}/g, "\n\n");
 
 type QuestionProviderConfig = {
   endpoint: string;
@@ -40,7 +70,7 @@ const buildPrompt = (
   messages: [
     {
       role: "system",
-      content: `You answer questions about Maxime Lemenand's CV and terminal portfolio. Use only the provided portfolio context. Do not invent missing details. Keep the answer direct, natural and concise. Always answer in ${answerLanguageNames[locale]}.`,
+      content: `You answer questions about Maxime Lemenand's CV and terminal portfolio. Use only the provided portfolio context. Do not invent missing details. Keep the answer direct, natural and concise. Always refer to Maxime Lemenand in the third person by name — never use "tu", "vous", "you" or any second-person form. Always answer in ${answerLanguageNames[locale]}.`,
     },
     {
       role: "user",
@@ -54,7 +84,7 @@ Answer in 2 to 5 concise sentences in ${answerLanguageNames[locale]}.`,
   ],
   temperature: 0.25,
   // eslint-disable-next-line camelcase
-  max_tokens: 300,
+  max_tokens: 450,
   stream: false,
 });
 
@@ -134,6 +164,7 @@ const Question: React.FC = () => {
   const { arg } = useContext(termContext);
   const { locale } = useContext(languageContext);
   const copy = uiText[locale];
+  const { typeAndExecute } = useContext(terminalActionsContext);
   const question = useMemo(() => arg.join(" ").trim(), [arg]);
   const cacheKey = `${locale}::${question}`;
   const [frameIndex, setFrameIndex] = useState(0);
@@ -269,7 +300,27 @@ const Question: React.FC = () => {
   }, [state.status]);
 
   if (!question) {
-    return <Wrapper data-testid="question">{copy.questionPlaceholder}</Wrapper>;
+    return (
+      <Wrapper data-testid="question">
+        <div>
+          {copy.questionUsage.split(/(<[^>]+>)/).map((part, i) =>
+            part.startsWith("<") && part.endsWith(">") ? (
+              <UsageHint key={i}>{part}</UsageHint>
+            ) : (
+              part
+            )
+          )}
+        </div>
+        <ExampleList>
+          <div>{copy.questionExamplesTitle}</div>
+          {copy.questionExamples(profile.firstName).map((ex: string) => (
+            <ExampleItem key={ex} onClick={() => typeAndExecute(ex)}>
+              {ex}
+            </ExampleItem>
+          ))}
+        </ExampleList>
+      </Wrapper>
+    );
   }
 
   if (state.status === "loading" || state.status === "idle") {

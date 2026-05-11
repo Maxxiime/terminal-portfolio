@@ -122,7 +122,18 @@ docker compose up -d --build
 
 ## ✏️ Personnaliser le contenu
 
-Tout le contenu personnel se trouve dans [`src/src/data/profile.ts`](src/src/data/profile.ts).  
+Tout le contenu personnel se trouve dans [`src/src/data/profile.ts`](src/src/data/profile.ts) — c'est le **seul fichier à modifier** pour adapter le portfolio à une nouvelle personne.
+
+Champs clés en haut de `profile.ts` :
+
+| Champ | Description |
+|-------|-------------|
+| `firstName` | Utilisé dans les questions d'exemple IA (`question quelles sont les compétences de Jean ?`) |
+| `name` | Nom complet affiché dans le terminal |
+| `email`, `linkedinUrl`, `githubUrl` | Liens de contact |
+| `terminalHost` | Domaine affiché dans le prompt du terminal |
+| `cvUrl` | URL du PDF du CV servi par le container |
+
 Les chaînes UI (3 langues) sont dans [`src/src/i18n.ts`](src/src/i18n.ts).
 
 Pour remplacer le CV : déposez votre PDF dans `src/public/cv/` sous le nom `resume.pdf` et mettez à jour `cvUrl` dans `profile.ts`.

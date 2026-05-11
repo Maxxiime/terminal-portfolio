@@ -30,9 +30,6 @@ const Output: React.FC<Props> = ({ index, cmd }) => {
 
   const specialCmds = ["question", "language", "gui", "experience", "contact"];
 
-  if (cmd === "question" && arg.length === 0)
-    return <UsageDiv data-testid="usage-output">{copy.questionUsage}</UsageDiv>;
-
   if (!specialCmds.includes(cmd) && arg.length > 0)
     return (
       <UsageDiv data-testid="usage-output">

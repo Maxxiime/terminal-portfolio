@@ -1,9 +1,10 @@
 import { useContext } from "react";
 import { languageContext } from "../../App";
 import { uiText } from "../../i18n";
-import { commands } from "../Terminal";
+import { commands, terminalActionsContext } from "../Terminal";
 import {
   Cmd,
+  CmdClickable,
   CmdDesc,
   CmdIcon,
   CmdList,
@@ -36,13 +37,16 @@ const commandIcons: Record<string, string> = {
 const Help: React.FC = () => {
   const { locale } = useContext(languageContext);
   const copy = uiText[locale];
+  const { typeAndExecute } = useContext(terminalActionsContext);
 
   return (
     <HelpWrapper data-testid="help">
       {commands.map(({ cmd }) => (
         <CmdList key={cmd}>
-          <CmdIcon>{commandIcons[cmd] || "•"}</CmdIcon>
-          <Cmd>{cmd}</Cmd>
+          <CmdClickable onClick={() => typeAndExecute(cmd)}>
+            <CmdIcon>{commandIcons[cmd] || "•"}</CmdIcon>
+            <Cmd>{cmd}</Cmd>
+          </CmdClickable>
           <CmdSep>-</CmdSep>
           <CmdDesc>
             {

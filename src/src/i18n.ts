@@ -175,6 +175,12 @@ export const uiText = {
     questionPlaceholder: "Pose une question sur mon CV ou mon portfolio.",
     questionUsage:
       "Usage: question <pose une question sur mon expérience, mes compétences, mes projets...>",
+    questionExamplesTitle: "Clique sur un exemple ou tape ta propre question :",
+    questionExamples: (firstName: string) => [
+      `question qu'est-ce que ${firstName} fait tourner dans son homelab ?`,
+      `question comment ${firstName} intègre-t-il l'IA dans son workflow DevOps ?`,
+      `question combien d'années d'expérience ${firstName} a-t-il avec Kubernetes ?`,
+    ],
     questionLoadingTitle: "Interrogation de l'agent portfolio…",
     questionLoadingRead:
       "Lecture du CV, de l'expérience, des compétences et des projets",
@@ -300,6 +306,12 @@ export const uiText = {
     questionPlaceholder: "Ask a question about my CV or portfolio.",
     questionUsage:
       "Usage: question <ask about my experience, skills, projects...>",
+    questionExamplesTitle: "Click an example or type your own question:",
+    questionExamples: (firstName: string) => [
+      `question what does ${firstName} run in his homelab?`,
+      `question how does ${firstName} integrate AI into his DevOps workflow?`,
+      `question how many years of experience does ${firstName} have with Kubernetes?`,
+    ],
     questionLoadingTitle: "Querying portfolio agent…",
     questionLoadingRead: "Reading CV, experience, skills and projects",
     questionLoadingDraft: "Preparing answer",
@@ -425,6 +437,12 @@ export const uiText = {
     questionPlaceholder: "Haz una pregunta sobre mi CV o portfolio.",
     questionUsage:
       "Uso: question <pregunta sobre mi experiencia, habilidades, proyectos...>",
+    questionExamplesTitle: "Haz clic en un ejemplo o escribe tu propia pregunta:",
+    questionExamples: (firstName: string) => [
+      `question ¿qué tiene ${firstName} funcionando en su homelab?`,
+      `question ¿cómo integra ${firstName} la IA en su flujo DevOps?`,
+      `question ¿cuántos años de experiencia tiene ${firstName} con Kubernetes?`,
+    ],
     questionLoadingTitle: "Consultando al agente del portfolio…",
     questionLoadingRead: "Leyendo CV, experiencia, habilidades y proyectos",
     questionLoadingDraft:

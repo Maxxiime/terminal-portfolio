@@ -71,6 +71,10 @@ export const termContext = createContext<Term>({
   index: 0,
 });
 
+export const terminalActionsContext = createContext<{
+  typeAndExecute: (cmd: string) => void;
+}>({ typeAndExecute: () => {} });
+
 const EXPERIENCE_SHORTCUTS = ["1", "2", "3"] as const;
 const CONTACT_SHORTCUTS = ["1", "2", "3", "4"] as const;
 const LANGUAGE_SHORTCUTS = ["1", "2", "3"] as const;
@@ -88,6 +92,9 @@ const Terminal = () => {
   const scrollFrameRef = useRef<number | null>(null);
   const scrollFallbackRef = useRef<number | null>(null);
   const lastNotFoundIndexRef = useRef<number | null>(null);
+  const autoTypeTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const [isAutoTyping, setIsAutoTyping] = useState(false);
+  const executeCommandRef = useRef<(val: string) => void>(() => {});
 
   const createHistoryEntry = useCallback(
     (value: string, notFoundIndex?: number): CommandEntry => {
@@ -288,11 +295,60 @@ const Terminal = () => {
   };
 
   useEffect(() => {
+    executeCommandRef.current = executeCommand;
+  });
+
+  const typeAndExecute = useCallback((cmd: string) => {
+    if (isAutoTyping) return;
+    autoTypeTimersRef.current.forEach(clearTimeout);
+    autoTypeTimersRef.current = [];
+    const timers = autoTypeTimersRef.current;
+    setIsAutoTyping(true);
+    cmd.split("").forEach((_, i) => {
+      timers.push(setTimeout(() => setInputVal(cmd.slice(0, i + 1)), i * 60));
+    });
+    timers.push(setTimeout(() => {
+      setIsAutoTyping(false);
+      executeCommandRef.current(cmd);
+    }, cmd.length * 60 + 180));
+  }, [isAutoTyping]);
+
+  useEffect(() => {
     if (!bootComplete || autoWelcomeRan.current) return;
 
     autoWelcomeRan.current = true;
-    executeCommand("welcome");
-  }, [bootComplete, executeCommand]);
+    executeCommandRef.current("welcome");
+
+    const helpText = "help";
+    const startDelay = 600;
+    const charDelay = 60;
+    const postTypeDelay = 180;
+    const timers = autoTypeTimersRef.current;
+
+    const startTimer = setTimeout(() => {
+      setIsAutoTyping(true);
+
+      helpText.split("").forEach((_, i) => {
+        const t = setTimeout(() => {
+          setInputVal(helpText.slice(0, i + 1));
+        }, i * charDelay);
+        timers.push(t);
+      });
+
+      const execTimer = setTimeout(() => {
+        setIsAutoTyping(false);
+        executeCommandRef.current("help");
+      }, helpText.length * charDelay + postTypeDelay);
+      timers.push(execTimer);
+    }, startDelay);
+
+    timers.push(startTimer);
+
+    return () => {
+      timers.forEach(clearTimeout);
+      autoTypeTimersRef.current = [];
+    };
+  }, [bootComplete]);
 
   const clearHistory = () => {
     setCmdHistory([]);
@@ -373,15 +429,16 @@ const Terminal = () => {
   };
 
   useEffect(() => {
-    if (!bootComplete) return;
+    if (!bootComplete || isAutoTyping) return;
 
     const timer = setTimeout(() => {
       inputRef?.current?.focus();
     }, 1);
     return () => clearTimeout(timer);
-  }, [bootComplete, inputVal, pointer]);
+  }, [bootComplete, isAutoTyping, inputVal, pointer]);
 
   return (
+    <terminalActionsContext.Provider value={{ typeAndExecute }}>
     <Wrapper data-testid="terminal-wrapper" ref={containerRef}>
       <BootSequence
         animate={!bootComplete}
@@ -450,12 +507,14 @@ const Terminal = () => {
             autoCapitalize="off"
             ref={inputRef}
             value={inputVal}
-            onKeyDown={handleKeyDown}
-            onChange={handleChange}
+            onKeyDown={isAutoTyping ? undefined : handleKeyDown}
+            onChange={isAutoTyping ? undefined : handleChange}
+            readOnly={isAutoTyping}
           />
         </Form>
       )}
     </Wrapper>
+    </terminalActionsContext.Provider>
   );
 };
 

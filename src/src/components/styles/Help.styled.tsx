@@ -7,27 +7,49 @@ export const HelpWrapper = styled.div`
 
 export const CmdList = styled.div`
   display: grid;
-  grid-template-columns: 1.5rem 9.5rem 1rem minmax(0, 1fr);
+  grid-template-columns: 11.5rem 1rem minmax(0, 1fr);
   column-gap: 0.5rem;
   align-items: start;
   margin-bottom: 0.1rem;
   line-height: 1.25rem;
 
   @media (max-width: 700px) {
-    grid-template-columns: 1.35rem 7.1rem 0.8rem minmax(0, 1fr);
+    grid-template-columns: 8.8rem 0.8rem minmax(0, 1fr);
     column-gap: 0.35rem;
     line-height: 1.2rem;
+  }
+`;
+
+export const CmdClickable = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+
+  &::after {
+    content: "↗";
+    color: ${({ theme }) => theme.colors?.primary};
+    font-size: 0.72em;
+    display: inline-block;
+    opacity: 0.6;
+    vertical-align: middle;
+    margin-left: 3px;
+    transition: opacity 0.12s;
+  }
+
+  &:hover::after {
+    opacity: 1;
   }
 `;
 
 export const CmdIcon = styled.span`
   width: 1.25rem;
   text-align: center;
+  flex-shrink: 0;
 `;
 
 export const Cmd = styled.span`
   color: ${({ theme }) => theme.colors?.primary};
-  display: block;
   white-space: nowrap;
 `;
 
