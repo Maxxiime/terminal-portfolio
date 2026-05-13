@@ -9,13 +9,13 @@ An interactive terminal-style portfolio with AI-powered Q&A, multilingual suppor
 <table>
   <tr>
     <td align="center"><b>Boot sequence</b></td>
-    <td align="center"><b>Help</b></td>
     <td align="center"><b>AI Q&A</b></td>
+    <td align="center"><b>Unknown command</b></td>
   </tr>
   <tr>
     <td><img src="docs/screenshots/boot.png" alt="Boot sequence" width="380"/></td>
-    <td><img src="docs/screenshots/help.png" alt="Help command" width="380"/></td>
-    <td><img src="docs/screenshots/question.png" alt="AI question" width="380"/></td>
+    <td><img src="docs/screenshots/question.png" alt="AI Q&A" width="380"/></td>
+    <td><img src="docs/screenshots/unknown_command.png" alt="Unknown command" width="380"/></td>
   </tr>
 </table>
 

@@ -461,6 +461,7 @@ const skillGroupsByLocale: Localized<SkillGroup[]> = {
       name: "Core",
       items: [
         "DevOps",
+        "SRE",
         "Infrastructure Automation",
         "Platform Operations",
         "Linux",
@@ -519,6 +520,7 @@ const skillGroupsByLocale: Localized<SkillGroup[]> = {
       name: "Core",
       items: [
         "DevOps",
+        "SRE",
         "Infrastructure Automation",
         "Platform Operations",
         "Linux",
@@ -577,6 +579,7 @@ const skillGroupsByLocale: Localized<SkillGroup[]> = {
       name: "Core",
       items: [
         "DevOps",
+        "SRE",
         "Infrastructure Automation",
         "Platform Operations",
         "Linux",

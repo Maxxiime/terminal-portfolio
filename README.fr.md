@@ -9,13 +9,13 @@ Un portfolio interactif en style terminal avec Q&R alimentée par IA, support mu
 <table>
   <tr>
     <td align="center"><b>Séquence de démarrage</b></td>
-    <td align="center"><b>Aide</b></td>
     <td align="center"><b>Q&R par IA</b></td>
+    <td align="center"><b>Commande inconnue</b></td>
   </tr>
   <tr>
     <td><img src="docs/screenshots/boot.png" alt="Séquence de démarrage" width="380"/></td>
-    <td><img src="docs/screenshots/help.png" alt="Commande help" width="380"/></td>
-    <td><img src="docs/screenshots/question.png" alt="Question IA" width="380"/></td>
+    <td><img src="docs/screenshots/question.png" alt="Q&R par IA" width="380"/></td>
+    <td><img src="docs/screenshots/unknown_command.png" alt="Commande inconnue" width="380"/></td>
   </tr>
 </table>
 

@@ -9,13 +9,13 @@ Un portfolio interactivo estilo terminal con preguntas y respuestas impulsadas p
 <table>
   <tr>
     <td align="center"><b>Secuencia de arranque</b></td>
-    <td align="center"><b>Ayuda</b></td>
     <td align="center"><b>Q&A con IA</b></td>
+    <td align="center"><b>Comando desconocido</b></td>
   </tr>
   <tr>
     <td><img src="docs/screenshots/boot.png" alt="Secuencia de arranque" width="380"/></td>
-    <td><img src="docs/screenshots/help.png" alt="Comando help" width="380"/></td>
-    <td><img src="docs/screenshots/question.png" alt="Pregunta IA" width="380"/></td>
+    <td><img src="docs/screenshots/question.png" alt="Q&A con IA" width="380"/></td>
+    <td><img src="docs/screenshots/unknown_command.png" alt="Comando desconocido" width="380"/></td>
   </tr>
 </table>
 
