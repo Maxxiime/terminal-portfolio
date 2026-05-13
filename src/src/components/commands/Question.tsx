@@ -79,12 +79,12 @@ ${getCompactPortfolioContext(locale)}
 
 Question: ${question}
 
-Answer in 2 to 5 concise sentences in ${answerLanguageNames[locale]}.`,
+Answer in 2 to 4 concise sentences in ${answerLanguageNames[locale]}. Never cut off mid-sentence.`,
     },
   ],
   temperature: 0.25,
   // eslint-disable-next-line camelcase
-  max_tokens: 450,
+  max_tokens: 2000,
   stream: false,
 });
 
