@@ -46,6 +46,11 @@ server {
     add_header Cache-Control "no-store";
   }
 
+  location = /index.html {
+    add_header Cache-Control "no-store, no-cache, must-revalidate";
+    try_files $uri =404;
+  }
+
   location = /manifest.webmanifest {
     return 301 /site.webmanifest;
   }
