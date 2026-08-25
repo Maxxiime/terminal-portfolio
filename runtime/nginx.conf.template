@@ -14,18 +14,18 @@ server {
   resolver_timeout 5s;
   access_log /dev/stdout question_api if=$log_question_api;
 
-  set $openrouter_api_host openrouter.ai;
+  set $ai_provider_url "${AI_PROVIDER_URL}";
 
   location = /api/question {
-    proxy_pass https://$openrouter_api_host/api/v1/chat/completions;
+    proxy_pass $ai_provider_url;
     proxy_http_version 1.1;
-    proxy_set_header Host $openrouter_api_host;
+    proxy_set_header Host $proxy_host;
     proxy_ssl_server_name on;
-    proxy_ssl_name $openrouter_api_host;
+    proxy_ssl_name $proxy_host;
     proxy_set_header Content-Type "application/json";
-    proxy_set_header Authorization "Bearer ${OPENROUTER_API_KEY}";
-    proxy_set_header HTTP-Referer "https://maxime-lemenand.com";
-    proxy_set_header X-Title "Maxime Lemenand Terminal Portfolio";
+    proxy_set_header Authorization "Bearer ${AI_PROVIDER_API_KEY}";
+    proxy_set_header HTTP-Referer "$scheme://$host";
+    proxy_set_header X-Title "Terminal Portfolio";
     proxy_set_header X-Request-Id $http_x_request_id;
     proxy_set_header X-Request-Source $http_x_request_source;
     proxy_set_header X-Request-Model $http_x_request_model;

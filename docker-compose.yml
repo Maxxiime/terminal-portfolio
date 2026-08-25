@@ -7,8 +7,27 @@ services:
     restart: unless-stopped
     environment:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - AI_PROVIDER_URL=${AI_PROVIDER_URL:-https://openrouter.ai/api/v1/chat/completions}
+      - AI_PROVIDER_API_KEY=${AI_PROVIDER_API_KEY:-${OPENROUTER_API_KEY}}
+      - AI_PROVIDER_MODEL=${AI_PROVIDER_MODEL:-openrouter/free}
+      - AI_PROVIDER_TYPE=${AI_PROVIDER_TYPE:-openai-compatible}
+      - PORTFOLIO_NAME=${PORTFOLIO_NAME:-}
+      - PORTFOLIO_FIRST_NAME=${PORTFOLIO_FIRST_NAME:-}
+      - PORTFOLIO_TERMINAL_HOST=${PORTFOLIO_TERMINAL_HOST:-}
+      - CONTENT_MODE=${CONTENT_MODE:-}
+      - CONTENT_GITHUB_OWNER=${CONTENT_GITHUB_OWNER:-}
+      - CONTENT_GITHUB_REPO=${CONTENT_GITHUB_REPO:-}
+      - CONTENT_GITHUB_REF=${CONTENT_GITHUB_REF:-}
+      - CONTENT_GITHUB_PATH=${CONTENT_GITHUB_PATH:-}
+      - CONTENT_HTTP_BASE_URL=${CONTENT_HTTP_BASE_URL:-}
+      - CONTENT_HTTP_VERSION_URL=${CONTENT_HTTP_VERSION_URL:-}
+      - CONTENT_LOCAL_BASE_URL=${CONTENT_LOCAL_BASE_URL:-}
+      - CONTENT_LOCAL_VERSION_URL=${CONTENT_LOCAL_VERSION_URL:-}
       - NODE_OPTIONS=--dns-result-order=ipv4first
       - DNS_RESULT_ORDER=ipv4first
+    volumes:
+      - ./config:/usr/share/nginx/html/config:ro
+      - ./data/content:/usr/share/nginx/html/data/content:ro
     dns:
       - 1.1.1.1
       - 8.8.8.8

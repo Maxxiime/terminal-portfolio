@@ -1,37 +1,46 @@
-# Homelab
+# Self-Hosted Infrastructure, Automation & AI Lab
 
-## Self-Hosted Infrastructure, Automation & AI Lab
+## 2014 - Présent
 
-Lab personnel construit et enrichi en continu depuis 2014. Il sert à expérimenter la virtualisation, les conteneurs, le stockage, le monitoring, les backups, l’identité, le réseau, la domotique, les LLM locaux et les agents IA, dans un environnement séparé et maîtrisé.
+Construit et enrichi en continu depuis 2014, ce lab personnel est centré sur l'infrastructure self-hosted, l'automatisation, les workflows assistés par l'IA et les intégrations smart home avancées. Au fil du temps, il est devenu un environnement réel utilisé pour expérimenter la virtualisation, les conteneurs, le stockage, le monitoring, les sauvegardes, l'identité, le réseau, les outils LLM locaux, les workflows à base d'agents et des intégrations sur mesure. Il comprend aussi de petites applications utilitaires et des pipelines d'automatisation pensés pour répondre à des besoins concrets, avec un fort accent sur la fiabilité, l'autonomie et la maintenabilité long terme.
 
 ## Infrastructure
 
-- Infrastructure de virtualisation et de conteneurs self-hosted
-- Stockage réseau avec redondance et sauvegardes
-- Environnements séparés pour les services, les tests et l’expérimentation
+- Proxmox Server — 64GB RAM / Xeon 16 Cores
+- Synology NAS — RAID5 16TB
+- ESXi Server — 32GB RAM / Xeon 8 Cores / 6TB
 
-## Virtualisation & conteneurs
+## Virtualization & Containers
 
-- Proxmox
 - Docker
-- Kubernetes / k3s
+- k3s
 
-## Automatisation
+## Automation & Workflows
 
 - n8n
 - Node-RED
+- Planka
 - Git
-- Terraform
-- Ansible
 
-## Observabilité
+## Monitoring & Observability
 
 - Frigate
 - Grafana
 - InfluxDB
 - Umami
 
-## Smart home & IoT
+## Networking & Security
+
+- AdGuard
+- Authentik
+- Nginx Proxy Manager
+- Unbound
+- WireGuard
+- pfSense
+- phpIPAM
+- Pentagi
+
+## Smart Home & IoT
 
 - Home Assistant
 - ESPHome
@@ -39,17 +48,26 @@ Lab personnel construit et enrichi en continu depuis 2014. Il sert à expérimen
 - Matter
 - Zigbee2MQTT
 
-## IA locale
+## AI & Local LLM
 
 - Hermes
+- OpenClaw
+- Mercury
 - OmniRoute
 - Ollama
-- Open WebUI
-- agents IA
-- workflows LLM locaux
+- OpenWebUI
+- AgentMemory
 
-## Accès & sécurité
+## Backup & Storage
 
-- Gestion d’identité et accès distant
-- DNS, reverse proxy et segmentation réseau
-- VPN et pratiques de durcissement adaptées à un environnement self-hosted
+- Synology
+- TrueNAS
+
+## Remote Access & Management
+
+- Guacamole
+
+## Documentation & Collaboration
+
+- Outline
+- Mail Server

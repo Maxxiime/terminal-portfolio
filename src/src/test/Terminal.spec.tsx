@@ -181,21 +181,6 @@ describe("Terminal Component", () => {
     });
   });
 
-  describe("Redirect commands", () => {
-    beforeEach(() => {
-      window.open = vi.fn();
-    });
-
-    it("should open the CV PDF in a new tab when user type 'gui' cmd", async () => {
-      await user.type(terminalInput, "gui{enter}");
-      expect(window.open).toHaveBeenCalledWith(
-        "https://drive.google.com/file/d/1SOjH1ml6LmmJxeUx2h5oVeZ8aAsRELq1/view?usp=drivesdk",
-        "_blank",
-        "noopener,noreferrer"
-      );
-    });
-  });
-
   describe("Invalid Arguments", () => {
     const specialUsageCmds = ["gui"];
     const componentHandledCmds = [

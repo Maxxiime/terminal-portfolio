@@ -1,4 +1,4 @@
-# Compétences
+# Habilidades
 
 ## Core
 

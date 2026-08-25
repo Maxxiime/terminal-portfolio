@@ -1,9 +1,7 @@
-# Bienvenue
+# Bienvenue sur mon terminal portfolio
 
 ## Maxime Lemenand
 
-Infrastructure / DevOps · Automatisation · Self-hosting · AI Ops
+Infrastructure / DevOps | Automatisation, self-hosting, opérations assistées par l'IA
 
-Portfolio terminal orienté infrastructure, opérations fiables, automatisation et expérimentations IA concrètes.
-
-Tapez `help` pour voir les commandes disponibles ou `question` pour poser une question assistée par IA.
+Tape help pour lister les commandes disponibles ou question pour obtenir des réponses assistées par l'IA à propos du portfolio.

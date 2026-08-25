@@ -69,7 +69,7 @@ cd terminal-portfolio
 
 # 2. Configurer l'environnement
 cp .env.example .env
-# éditer .env — définir OPENROUTER_API_KEY et PORT
+# éditer .env — choisir le provider IA et la source des contenus
 
 # 3. Déployer
 ./deploy.sh
@@ -77,12 +77,45 @@ cp .env.example .env
 
 Le portfolio est disponible sur `http://localhost:3012` (ou le PORT configuré).
 
-## 🔑 Variables d'environnement
+## 🔧 Configuration
 
-| Variable             | Description                                   | Requis |
-|----------------------|-----------------------------------------------|--------|
-| `OPENROUTER_API_KEY` | Clé API OpenRouter (le tier gratuit fonctionne) | Oui  |
-| `PORT`               | Port hôte (défaut : `3012`)                   | Non    |
+Le fichier le plus simple à modifier pour créer un nouveau portfolio est [`config/portfolio.json`](config/portfolio.json). Il contient le nom, le hostname du terminal, les textes de l'assistant, les métadonnées SEO, les questions suggérées, le modèle IA et la source Markdown.
+
+Docker monte ce fichier au démarrage :
+
+```yaml
+volumes:
+  - ./config:/usr/share/nginx/html/config:ro
+  - ./data/content:/usr/share/nginx/html/data/content:ro
+```
+
+Modifiez les fichiers Markdown dans `content/fr/`, `content/en/` et `content/es/` pour mettre à jour les commandes `about`, `skills`, `lab`, `experience`, `projects`, `education`, `certification`, `ai` et `welcome`. Le navigateur vérifie la version configurée au démarrage et ne retélécharge les fichiers qu'en cas de changement. La commande `question` utilise les mêmes Markdown.
+
+### Variables d'environnement
+
+| Variable | Description | Requis |
+|---|---|---|
+| `AI_PROVIDER_URL` | URL OpenAI-compatible des chat completions | Oui, sauf proxy legacy |
+| `AI_PROVIDER_API_KEY` | Clé API conservée côté nginx | Selon le provider |
+| `AI_PROVIDER_MODEL` | Nom du modèle | Oui |
+| `AI_PROVIDER_TYPE` | Libellé du provider, actuellement `openai-compatible` | Non |
+| `PORT` | Port hôte, défaut `3012` | Non |
+| `PORTFOLIO_NAME` | Surcharge du nom affiché | Non |
+| `PORTFOLIO_FIRST_NAME` | Surcharge du prénom | Non |
+| `PORTFOLIO_TERMINAL_HOST` | Hostname affiché dans le prompt | Non |
+| `CONTENT_MODE` | `github`, `http` ou `local` | Non |
+| `CONTENT_GITHUB_OWNER` | Username/organisation GitHub | Mode GitHub |
+| `CONTENT_GITHUB_REPO` | Nom du dépôt GitHub | Mode GitHub |
+| `CONTENT_GITHUB_REF` | Branche ou tag, généralement `main` | Mode GitHub |
+| `CONTENT_GITHUB_PATH` | Dossier Markdown, généralement `content` | Mode GitHub |
+| `CONTENT_HTTP_BASE_URL` | URL HTTP/S3-compatible | Mode HTTP |
+| `CONTENT_HTTP_VERSION_URL` | URL optionnelle de version/checksum | Non |
+| `CONTENT_LOCAL_BASE_URL` | Chemin monté, généralement `/data/content` | Mode local |
+| `CONTENT_LOCAL_VERSION_URL` | Fichier de version optionnel | Non |
+| `VITE_UMAMI_URL` | URL Umami optionnelle, au build | Non |
+| `VITE_UMAMI_WEBSITE_ID` | Website ID Umami public | Non |
+
+Les exemples OpenRouter, OpenAI et Ollama sont dans [`.env.example`](.env.example). Ne placez jamais `AI_PROVIDER_API_KEY` dans le frontend.
 
 Obtenez une clé gratuite sur [openrouter.ai/keys](https://openrouter.ai/keys).
 
@@ -120,9 +153,18 @@ docker compose up -d --build
 | `/cv/resume.pdf`  | PDF du CV                |
 | `/api/question`   | Proxy OpenRouter (POST)  |
 
-## ✏️ Personnaliser le contenu
+## ✏️ Personnaliser le portfolio
 
-Tout le contenu personnel se trouve dans [`src/src/data/profile.ts`](src/src/data/profile.ts) — c'est le **seul fichier à modifier** pour adapter le portfolio à une nouvelle personne.
+Utilisez ces fichiers :
+
+| Fichier | Rôle |
+|---|---|
+| [`config/portfolio.json`](config/portfolio.json) | Nom, assistant, SEO, questions, source Markdown et modèle |
+| [`content/fr/`](content/fr/) | Contenu français et connaissances IA |
+| [`content/en/`](content/en/) | Contenu anglais et connaissances IA |
+| [`content/es/`](content/es/) | Contenu espagnol et connaissances IA |
+| [`src/src/data/profile.ts`](src/src/data/profile.ts) | Fallback structuré, contacts, expérience, projets et CV |
+| [`src/src/i18n.ts`](src/src/i18n.ts) | Chaînes UI du terminal |
 
 Champs clés en haut de `profile.ts` :
 
@@ -137,6 +179,8 @@ Champs clés en haut de `profile.ts` :
 Les chaînes UI (3 langues) sont dans [`src/src/i18n.ts`](src/src/i18n.ts).
 
 Pour remplacer le CV : déposez votre PDF dans `src/public/cv/` sous le nom `resume.pdf` et mettez à jour `cvUrl` dans `profile.ts`.
+
+En mode local, définissez `CONTENT_MODE=local`, `CONTENT_LOCAL_BASE_URL=/data/content` et placez les fichiers dans `data/content/<locale>/`. Pour GitHub, HTTPS ou S3-compatible, utilisez le mode correspondant dans `config/portfolio.json` ou `.env`.
 
 ## 🔄 Reverse proxy (nginx / NPM)
 

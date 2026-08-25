@@ -4,18 +4,19 @@
 HEALTH_FILE=/usr/share/nginx/html/health.json
 
 api_key_present=false
-[ -n "${OPENROUTER_API_KEY:-}" ] && api_key_present=true
+[ -n "${AI_PROVIDER_API_KEY:-}" ] && api_key_present=true
 
 dns_ok=false
 dns_first=""
-if nslookup openrouter.ai > /tmp/dns.txt 2>&1; then
+provider_host=$(printf '%s' "${AI_PROVIDER_URL:-}" | sed -E 's#^[a-zA-Z]+://##; s#/.*##')
+if nslookup "${provider_host:-openrouter.ai}" > /tmp/dns.txt 2>&1; then
   dns_ok=true
   dns_first=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' /tmp/dns.txt | grep -v '^$' | tail -1)
 fi
 
 https_ok=false
 https_status="000"
-if wget -q --spider -T 10 https://openrouter.ai 2>/dev/null; then
+if wget -q --spider -T 10 "${AI_PROVIDER_URL:-https://openrouter.ai}" 2>/dev/null; then
   https_ok=true
   https_status="200"
 fi
@@ -32,7 +33,7 @@ cat > "$HEALTH_FILE" <<EOF
   "dns_resolution_ok": $dns_ok,
   "dns_first_result": "$dns_first",
   "outbound_https_ok": $https_ok,
-  "openrouter_https_status": "$https_status",
-  "configured_model": "openrouter/free"
+  "provider_url": "${AI_PROVIDER_URL:-}",
+  "configured_model": "${AI_PROVIDER_MODEL:-}"
 }
 EOF
