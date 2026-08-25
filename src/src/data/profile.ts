@@ -5,7 +5,6 @@ const baseProfile = {
   firstName: "Maxime",
   email: "contact@maxime-lemenand.com",
   linkedinUrl: "https://www.linkedin.com/in/maximelemenand",
-  terminalHost: "portfolio.local",
   guiUrl: "/",
   cvUrl: "/cv/resume.pdf",
   githubUrl: "https://github.com/Maxxiime",

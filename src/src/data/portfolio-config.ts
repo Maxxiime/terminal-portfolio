@@ -18,15 +18,15 @@ export type PortfolioRuntimeConfig = {
 };
 
 export const defaultPortfolioConfig: PortfolioRuntimeConfig = {
-  person: { name: "Maxime Lemenand", firstName: "Maxime", terminalHost: "portfolio.local" },
+  person: { name: "Portfolio Owner", firstName: "Owner", terminalHost: "portfolio.local" },
   assistant: {
-    displayName: "Assistant de Maxime",
-    uri: "maxime://assistant",
-    title: "Que voulez-vous savoir sur Maxime ?",
-    subtitle: "DevOps · SRE · Automatisation · Self-hosting · AI Ops",
-    disclaimer: "Markdown portfolio · réponses générées par IA",
+    displayName: "Portfolio Assistant",
+    uri: "assistant://portfolio",
+    title: "What would you like to know?",
+    subtitle: "Markdown content · AI-assisted answers",
+    disclaimer: "Markdown content · AI-generated answers",
   },
-  portfolioLabel: "portfolio.cli — embedded",
+  portfolioLabel: "portfolio.cli",
   ai: {
     providerType: "openai-compatible",
     providerUrl: "https://openrouter.ai/api/v1/chat/completions",
@@ -34,8 +34,8 @@ export const defaultPortfolioConfig: PortfolioRuntimeConfig = {
   },
   analytics: { umamiUrl: "", websiteId: "" },
   seo: {
-    title: "Maxime Lemenand | Terminal Portfolio",
-    description: "Infrastructure / DevOps terminal portfolio focused on automation, self-hosting and AI-assisted operations.",
+    title: "Terminal Portfolio",
+    description: "Interactive terminal portfolio.",
     image: "/og-image.png",
   },
   suggestions: { fr: [], en: [], es: [] },
