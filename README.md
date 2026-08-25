@@ -81,6 +81,8 @@ The portfolio is available at `http://localhost:3012` (or your configured PORT).
 
 The easiest file to edit for a new portfolio is [`config/portfolio.json`](config/portfolio.json). It contains the name, terminal hostname, assistant labels, SEO text, suggested questions, AI model, and Markdown source.
 
+The mounted JSON file is the primary portfolio configuration. Environment variables are optional deployment overrides: an empty variable does not erase a value from `config/portfolio.json`. You do not need to fill the HTTP and local content variables when using GitHub mode; only the selected source is read.
+
 Docker mounts this file at runtime, so it can be changed without rebuilding the image:
 
 ```yaml
@@ -112,7 +114,7 @@ Edit the Markdown files in `content/fr/`, `content/en/`, and `content/es/` to up
 | `CONTENT_HTTP_VERSION_URL` | Optional version/checksum URL | No |
 | `CONTENT_LOCAL_BASE_URL` | URL path for mounted files, usually `/data/content` | For local mode |
 | `CONTENT_LOCAL_VERSION_URL` | Optional mounted version file | No |
-| `VITE_UMAMI_URL` | Optional Umami server URL, used at build time | No |
+| `VITE_UMAMI_URL` | Optional Umami base URL, without `/script.js`, used at build time | No |
 | `VITE_UMAMI_WEBSITE_ID` | Optional public Umami website ID | No |
 
 Provider examples are already included in [`.env.example`](.env.example): OpenRouter, OpenAI, and Ollama through its OpenAI-compatible endpoint. Never put `AI_PROVIDER_API_KEY` in frontend code.

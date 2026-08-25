@@ -4,7 +4,7 @@ set -e
 # Build frontend
 echo "[1/3] Building frontend..."
 cd src
-npm install
+HUSKY=0 npm ci
 npm run build
 cd ..
 

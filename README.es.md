@@ -187,3 +187,4 @@ En modo local, define `CONTENT_MODE=local`, `CONTENT_LOCAL_BASE_URL=/data/conten
 Si utiliza un reverse proxy, asegúrese de que reenvíe las solicitudes tal cual — la configuración nginx dentro del container gestiona directamente el enrutamiento SPA y los archivos estáticos.
 
 El service worker (PWA) excluye automáticamente `/health` y `/cv/` del fallback SPA.
+La configuración principal del portfolio es [`config/portfolio.json`](config/portfolio.json). Las variables de entorno son overrides opcionales para el despliegue. Una variable vacía no sobrescribe el valor del archivo JSON. Si `CONTENT_MODE=github`, no es necesario rellenar las variables HTTP o local: no se utilizan.

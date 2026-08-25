@@ -45,35 +45,38 @@ let runtimeConfig = defaultPortfolioConfig;
 
 export const getPortfolioConfig = () => runtimeConfig;
 
-const mergeConfig = (input: Partial<PortfolioRuntimeConfig>): PortfolioRuntimeConfig => ({
-  ...defaultPortfolioConfig,
+const mergeConfig = (
+  input: Partial<PortfolioRuntimeConfig>,
+  base: PortfolioRuntimeConfig = defaultPortfolioConfig,
+): PortfolioRuntimeConfig => ({
+  ...base,
   ...input,
   person: {
-    ...defaultPortfolioConfig.person,
+    ...base.person,
     ...input.person,
-    name: input.person?.name || defaultPortfolioConfig.person.name,
-    firstName: input.person?.firstName || defaultPortfolioConfig.person.firstName,
-    terminalHost: input.person?.terminalHost || defaultPortfolioConfig.person.terminalHost,
+    name: input.person?.name || base.person.name,
+    firstName: input.person?.firstName || base.person.firstName,
+    terminalHost: input.person?.terminalHost || base.person.terminalHost,
   },
-  assistant: { ...defaultPortfolioConfig.assistant, ...input.assistant },
-  portfolioLabel: input.portfolioLabel || defaultPortfolioConfig.portfolioLabel,
-  ai: { ...defaultPortfolioConfig.ai, ...input.ai },
-  seo: { ...defaultPortfolioConfig.seo, ...input.seo },
-  suggestions: { ...defaultPortfolioConfig.suggestions, ...input.suggestions },
+  assistant: { ...base.assistant, ...input.assistant },
+  portfolioLabel: input.portfolioLabel || base.portfolioLabel,
+  ai: { ...base.ai, ...input.ai, model: input.ai?.model || base.ai.model },
+  seo: { ...base.seo, ...input.seo },
+  suggestions: { ...base.suggestions, ...input.suggestions },
   content: {
-    ...defaultPortfolioConfig.content,
+    ...base.content,
     ...input.content,
-    mode: input.content?.mode || defaultPortfolioConfig.content.mode,
+    mode: input.content?.mode || base.content.mode,
     github: {
-      ...defaultPortfolioConfig.content.github,
+      ...base.content.github,
       ...input.content?.github,
-      owner: input.content?.github?.owner || defaultPortfolioConfig.content.github.owner,
-      repo: input.content?.github?.repo || defaultPortfolioConfig.content.github.repo,
-      ref: input.content?.github?.ref || defaultPortfolioConfig.content.github.ref,
-      path: input.content?.github?.path || defaultPortfolioConfig.content.github.path,
+      owner: input.content?.github?.owner || base.content.github.owner,
+      repo: input.content?.github?.repo || base.content.github.repo,
+      ref: input.content?.github?.ref || base.content.github.ref,
+      path: input.content?.github?.path || base.content.github.path,
     },
-    http: { ...defaultPortfolioConfig.content.http, ...input.content?.http },
-    local: { ...defaultPortfolioConfig.content.local, ...input.content?.local },
+    http: { ...base.content.http, ...input.content?.http },
+    local: { ...base.content.local, ...input.content?.local },
   },
 });
 
@@ -83,7 +86,12 @@ export async function loadPortfolioConfig() {
     const response = await fetch("/config/portfolio.json", { cache: "no-store" });
     if (response.ok) runtimeConfig = mergeConfig(await response.json() as Partial<PortfolioRuntimeConfig>);
     const runtimeResponse = await fetch("/runtime-config.json", { cache: "no-store" });
-    if (runtimeResponse.ok) runtimeConfig = mergeConfig(await runtimeResponse.json() as Partial<PortfolioRuntimeConfig>);
+    if (runtimeResponse.ok) {
+      runtimeConfig = mergeConfig(
+        await runtimeResponse.json() as Partial<PortfolioRuntimeConfig>,
+        runtimeConfig,
+      );
+    }
   } catch {
     // Bundled defaults remain usable when the optional runtime file is unavailable.
   }

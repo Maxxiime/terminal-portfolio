@@ -55,7 +55,9 @@
         if (!url || !websiteId || url.includes("%VITE_") || websiteId.includes("%VITE_")) return;
         const script = document.createElement("script");
         script.defer = true;
-        script.src = `${url.replace(/\/$/, "")}/script.js`;
+        script.src = url.endsWith("/script.js")
+          ? url
+          : `${url.replace(/\/$/, "")}/script.js`;
         script.dataset.websiteId = websiteId;
         document.head.appendChild(script);
       })();
