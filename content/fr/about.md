@@ -1,3 +1,7 @@
+# Maxime Lemenand
+
+Infrastructure / DevOps | Automatisation, self-hosting, opérations assistées par l'IA
+
 Je travaille sur l'infrastructure, l'automatisation et les systèmes fiables, avec une approche DevOps très terrain.
 
 Mon parcours couvre les systèmes, le cloud, le réseau, la virtualisation, les conteneurs, l'observabilité et l'automatisation d'infrastructure.

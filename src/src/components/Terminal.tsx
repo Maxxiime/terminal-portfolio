@@ -45,6 +45,7 @@ export const commands: Command = [
   { cmd: "help", tab: 9 },
   { cmd: "lab", tab: 8 },
   { cmd: "language", tab: 3 },
+  { cmd: "projects", tab: 2 },
   { cmd: "question", tab: 1 },
   { cmd: "skills", tab: 7 },
   { cmd: "welcome", tab: 6 },
@@ -73,9 +74,9 @@ export const termContext = createContext<Term>({
 
 export const terminalActionsContext = createContext<{
   typeAndExecute: (cmd: string) => void;
-}>({ typeAndExecute: () => {} });
+  restartTerminal: () => void;
+}>({ typeAndExecute: () => {}, restartTerminal: () => {} });
 
-const EXPERIENCE_SHORTCUTS = ["1", "2", "3"] as const;
 const CONTACT_SHORTCUTS = ["1", "2", "3", "4"] as const;
 const LANGUAGE_SHORTCUTS = ["1", "2", "3"] as const;
 const AUTO_SCROLL_THRESHOLD = 48;
@@ -94,6 +95,7 @@ const Terminal = () => {
   const lastNotFoundIndexRef = useRef<number | null>(null);
   const autoTypeTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [isAutoTyping, setIsAutoTyping] = useState(false);
+  const [isDisconnected, setIsDisconnected] = useState(false);
   const executeCommandRef = useRef<(val: string) => void>(() => {});
 
   const createHistoryEntry = useCallback(
@@ -219,11 +221,9 @@ const Terminal = () => {
         lastMeaningfulCommand === "language" ||
         /^language (?:[1-3]|fr|en|es)$/.test(lastMeaningfulCommand || "");
       const normalizedValue =
-        EXPERIENCE_SHORTCUTS.includes(
-          trimmedValue as (typeof EXPERIENCE_SHORTCUTS)[number]
-        ) &&
+        /^\d+$/.test(trimmedValue) &&
         (lastMeaningfulCommand === "experience" ||
-          /^experience [1-3]$/.test(lastMeaningfulCommand || ""))
+          /^experience \d+$/.test(lastMeaningfulCommand || ""))
           ? `experience ${trimmedValue}`
           : LANGUAGE_SHORTCUTS.includes(
               trimmedValue as (typeof LANGUAGE_SHORTCUTS)[number]
@@ -264,6 +264,7 @@ const Terminal = () => {
           createHistoryEntry(normalizedValue, notFoundIndex),
           ...prev,
         ]);
+        if (commandName === "exit") setIsDisconnected(true);
       }
 
       setInputVal("");
@@ -356,8 +357,22 @@ const Terminal = () => {
     setPointer(-1);
   };
 
+  const restartTerminal = useCallback(() => {
+    autoTypeTimersRef.current.forEach(clearTimeout);
+    autoTypeTimersRef.current = [];
+    autoWelcomeRan.current = isTest;
+    setIsAutoTyping(false);
+    setIsDisconnected(false);
+    setBootComplete(isTest);
+    setCmdHistory(isTest ? [createHistoryEntry("welcome")] : []);
+    setInputVal("");
+    setHints([]);
+    setPointer(-1);
+    setRerender(false);
+  }, [createHistoryEntry, isTest]);
+
   const handleDivClick = () => {
-    if (!bootComplete) return;
+    if (!bootComplete || isDisconnected) return;
     inputRef.current && inputRef.current.focus();
   };
 
@@ -366,7 +381,7 @@ const Terminal = () => {
     return () => {
       document.removeEventListener("click", handleDivClick);
     };
-  }, [bootComplete]);
+  }, [bootComplete, isDisconnected]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     setRerender(false);
@@ -429,16 +444,16 @@ const Terminal = () => {
   };
 
   useEffect(() => {
-    if (!bootComplete || isAutoTyping) return;
+    if (!bootComplete || isAutoTyping || isDisconnected) return;
 
     const timer = setTimeout(() => {
       inputRef?.current?.focus();
     }, 1);
     return () => clearTimeout(timer);
-  }, [bootComplete, isAutoTyping, inputVal, pointer]);
+  }, [bootComplete, isAutoTyping, inputVal, isDisconnected, pointer]);
 
   return (
-    <terminalActionsContext.Provider value={{ typeAndExecute }}>
+    <terminalActionsContext.Provider value={{ typeAndExecute, restartTerminal }}>
     <Wrapper data-testid="terminal-wrapper" ref={containerRef}>
       <BootSequence
         animate={!bootComplete}
@@ -491,7 +506,7 @@ const Terminal = () => {
           ))}
         </div>
       )}
-      {bootComplete && (
+      {bootComplete && !isDisconnected && (
         <Form onSubmit={handleSubmit}>
           <label htmlFor="terminal-input">
             <TermInfo /> <MobileBr />

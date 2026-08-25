@@ -113,7 +113,7 @@ cp private/.IAinformation.example.md private/.IAinformation.md
 chmod 600 private/.IAinformation.md
 ```
 
-Configura la ruta con `ai.privateContextFile: "/run/portfolio-private/.IAinformation.md"`. No es una bóveda de secretos: el provider recibe el contenido y el modelo puede divulgar un dato relevante. No guardes contraseñas, claves API, tokens ni credenciales.
+Configura la ruta con `ai.privateContextFile: "/run/portfolio-private/.IAinformation.md"` y el límite de salida con `ai.maxOutputTokens: 5000`. Este límite solo afecta a la respuesta; la entrada Markdown y la salida comparten la ventana de contexto del modelo. No es una bóveda de secretos: el provider recibe el contenido y el modelo puede divulgar un dato relevante. No guardes contraseñas, claves API, tokens ni credenciales.
 
 ### Variables de entorno
 

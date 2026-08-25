@@ -87,9 +87,12 @@ Example provider configuration:
   "providerType": "openai-compatible",
   "providerUrl": "https://openrouter.ai/api/v1/chat/completions",
   "model": "openrouter/free",
+  "maxOutputTokens": 5000,
   "privateContextFile": "/run/portfolio-private/.IAinformation.md"
 }
 ```
+
+`maxOutputTokens` limits only the generated response. Markdown input and output share the model context window. The backend accepts a configurable value up to `8192` tokens.
 
 For OpenAI, use `https://api.openai.com/v1/chat/completions` and a model such as `gpt-4o-mini`. For Ollama, use `http://ollama:11434/v1/chat/completions` and a locally available model. The provider must accept the OpenAI chat-completions request format.
 

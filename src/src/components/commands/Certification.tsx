@@ -10,12 +10,21 @@ const Certification: React.FC = () => {
   const fallbackItems = getCertificationItems(locale);
   const markdownItems = getMarkdownSections(locale, "certification")
     .filter(section => section.level === 2 && section.title)
-    .map((section, index) => ({
-      title: section.title,
-      issuer: section.paragraphs[0] || "",
-      issued: section.paragraphs[1] || "",
-      iconUrl: fallbackItems[index]?.iconUrl || "/brands/terminal-prompt.svg",
-    }));
+    .map((section, index) => {
+      const iconLine = section.paragraphs.find(paragraph => /^icon\s*:/i.test(paragraph));
+      const text = section.paragraphs.filter(paragraph => paragraph !== iconLine);
+      const iconValue = iconLine?.replace(/^icon\s*:/i, "").trim();
+      const iconUrl = iconValue
+        ? iconValue.startsWith("/") ? iconValue : `/brands/${iconValue}`
+        : fallbackItems[index]?.iconUrl || "/brands/terminal-prompt.svg";
+
+      return {
+        title: section.title,
+        issuer: text[0] || "",
+        issued: text[1] || "",
+        iconUrl,
+      };
+    });
   const certificationItems = markdownItems.length ? markdownItems : fallbackItems;
 
   return (

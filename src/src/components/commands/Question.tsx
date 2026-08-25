@@ -68,28 +68,32 @@ const buildPrompt = (
   question: string,
   locale: "fr" | "en" | "es",
   model: string
-) => ({
-  model,
-  messages: [
-    {
-      role: "system",
-      content: `You answer questions about Maxime Lemenand's CV and terminal portfolio. Use only the provided portfolio context. Do not invent missing details. Keep the answer direct, natural and concise. Always refer to Maxime Lemenand in the third person by name — never use "tu", "vous", "you" or any second-person form. Always answer in ${answerLanguageNames[locale]}.`,
-    },
-    {
-      role: "user",
-      content: `Portfolio context:
+) => {
+  const ownerName = getPortfolioConfig().person.name;
+
+  return {
+    model,
+    messages: [
+      {
+        role: "system",
+        content: `You answer questions about ${ownerName}'s CV and terminal portfolio. Use only the provided portfolio context. Do not invent missing details. Keep the answer direct and natural. Always refer to ${ownerName} in the third person by name — never use "tu", "vous", "you" or any second-person form. Always answer in ${answerLanguageNames[locale]}.`,
+      },
+      {
+        role: "user",
+        content: `Portfolio context:
 ${getCompactPortfolioContext(locale)}
 
 Question: ${question}
 
-Answer in 2 to 4 concise sentences in ${answerLanguageNames[locale]}. Never cut off mid-sentence.`,
-    },
-  ],
-  temperature: 0.25,
-  // eslint-disable-next-line camelcase
-  max_tokens: 2000,
-  stream: false,
-});
+Answer in ${answerLanguageNames[locale]}. If the question asks for the complete history, every experience, all projects, or a detailed answer, include every matching Markdown entry with its dates and relevant details. Otherwise stay concise. Never cut off an item or sentence.`,
+      },
+    ],
+    temperature: 0.25,
+    // eslint-disable-next-line camelcase
+    max_tokens: getPortfolioConfig().ai.maxOutputTokens,
+    stream: false,
+  };
+};
 
 const extractErrorMessage = (raw: string, locale: "fr" | "en" | "es") => {
   const copy = uiText[locale];

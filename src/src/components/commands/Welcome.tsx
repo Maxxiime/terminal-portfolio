@@ -29,7 +29,7 @@ const Welcome: React.FC = () => {
   const markdownProfile = markdownSections.find(section => section.title === profile.name || section.title === config.person.name);
   const welcomeHeadline = markdownSections[0]?.title || copy.welcomeHeadline;
   const markdownTagline = markdownProfile?.paragraphs[0] || profile.title;
-  const markdownHint = markdownProfile?.paragraphs[1] || copy.welcomeHint;
+  const markdownHint = markdownProfile ? markdownProfile.paragraphs[1] || "" : copy.welcomeHint;
 
   return (
     <HeroContainer data-testid="welcome">
@@ -39,8 +39,8 @@ const Welcome: React.FC = () => {
         <div>{config.person.name}</div>
         <div>{markdownTagline}</div>
         <div aria-hidden="true">&nbsp;</div>
-        <div>{renderWelcomeHint(markdownHint)}</div>
-        <div aria-hidden="true">&nbsp;</div>
+        {markdownHint && <div>{renderWelcomeHint(markdownHint)}</div>}
+        {markdownHint && <div aria-hidden="true">&nbsp;</div>}
       </HeroMeta>
     </HeroContainer>
   );

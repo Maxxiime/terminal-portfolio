@@ -6,7 +6,7 @@ export type PortfolioRuntimeConfig = {
   person: { name: string; firstName: string; terminalHost: string };
   assistant: { displayName: string; uri: string; title: LocalizedText; subtitle: LocalizedText; disclaimer: LocalizedText };
   portfolioLabel: string;
-  ai: { providerType: string; providerUrl: string; model: string; privateContextFile: string };
+  ai: { providerType: string; providerUrl: string; model: string; maxOutputTokens: number; privateContextFile: string };
   analytics: { umamiUrl: string; websiteId: string };
   seo: { title: string; description: string; image: string };
   suggestions: Record<Locale, string[]>;
@@ -36,6 +36,7 @@ export const defaultPortfolioConfig: PortfolioRuntimeConfig = {
     providerType: "openai-compatible",
     providerUrl: "https://openrouter.ai/api/v1/chat/completions",
     model: "openrouter/free",
+    maxOutputTokens: 5000,
     privateContextFile: "/run/portfolio-private/.IAinformation.md",
   },
   analytics: { umamiUrl: "", websiteId: "" },
@@ -83,6 +84,9 @@ const mergeConfig = (
     providerType: input.ai?.providerType || base.ai.providerType,
     providerUrl: input.ai?.providerUrl || base.ai.providerUrl,
     model: input.ai?.model || base.ai.model,
+    maxOutputTokens: Number.isFinite(input.ai?.maxOutputTokens) && Number(input.ai?.maxOutputTokens) > 0
+      ? Math.trunc(Number(input.ai?.maxOutputTokens))
+      : base.ai.maxOutputTokens,
     privateContextFile: input.ai?.privateContextFile || base.ai.privateContextFile,
   },
   analytics: { ...base.analytics, ...input.analytics },

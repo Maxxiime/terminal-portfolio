@@ -6,6 +6,8 @@ const DEFAULT_CONFIG_FILE = "/usr/share/nginx/html/config/portfolio.json";
 const DEFAULT_PRIVATE_CONTEXT_FILE = "/run/portfolio-private/.IAinformation.md";
 const MAX_REQUEST_BYTES = 2 * 1024 * 1024;
 const PROVIDER_TIMEOUT_MS = 85_000;
+const DEFAULT_MAX_OUTPUT_TOKENS = 5_000;
+const HARD_MAX_OUTPUT_TOKENS = 8_192;
 
 export async function readPrivateContext(filePath) {
   try {
@@ -36,9 +38,13 @@ export function buildProviderPayload(payload, config, privateContext = "") {
   };
 
   const requestedMaxTokens = Number(payload?.max_tokens);
-  const maxTokens = Number.isFinite(requestedMaxTokens)
-    ? Math.min(4096, Math.max(1, Math.trunc(requestedMaxTokens)))
-    : 1200;
+  const configuredMaxTokens = Number(config?.ai?.maxOutputTokens);
+  const serverMaxTokens = Number.isFinite(configuredMaxTokens) && configuredMaxTokens > 0
+    ? Math.min(HARD_MAX_OUTPUT_TOKENS, Math.trunc(configuredMaxTokens))
+    : DEFAULT_MAX_OUTPUT_TOKENS;
+  const maxTokens = Number.isFinite(requestedMaxTokens) && requestedMaxTokens > 0
+    ? Math.min(serverMaxTokens, Math.trunc(requestedMaxTokens))
+    : serverMaxTokens;
 
   return {
     ...payload,

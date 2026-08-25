@@ -45,6 +45,7 @@
     "providerType": "openai-compatible",
     "providerUrl": "https://openrouter.ai/api/v1/chat/completions",
     "model": "openrouter/free",
+    "maxOutputTokens": 5000,
     "privateContextFile": "/run/portfolio-private/.IAinformation.md"
   },
   "analytics": {

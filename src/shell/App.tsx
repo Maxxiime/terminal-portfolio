@@ -171,11 +171,11 @@ export default function App() {
         },
         {
           role: "user",
-          content: `PORTFOLIO MARKDOWN\n\n${getMarkdownKnowledgeBase(language)}\n\nQUESTION\n${clean}\n\nGive a concise, factual answer. Clearly say when the information is absent.`,
+          content: `PORTFOLIO MARKDOWN\n\n${getMarkdownKnowledgeBase(language)}\n\nQUESTION\n${clean}\n\nGive a factual answer. If the visitor asks for the complete history, every experience, all projects, or a detailed answer, include every matching Markdown entry with its dates and relevant details. Otherwise stay concise. Clearly say when information is absent and never cut off an item or sentence.`,
         },
       ],
       temperature: 0.25,
-      max_tokens: 1200,
+      max_tokens: config.ai.maxOutputTokens,
       stream: false,
     };
 

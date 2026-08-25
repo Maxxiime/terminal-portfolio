@@ -173,9 +173,12 @@ Configuration dans `config/portfolio.json` :
   "providerType": "openai-compatible",
   "providerUrl": "https://openrouter.ai/api/v1/chat/completions",
   "model": "openrouter/free",
+  "maxOutputTokens": 5000,
   "privateContextFile": "/run/portfolio-private/.IAinformation.md"
 }
 ```
+
+`maxOutputTokens` limite uniquement la réponse générée. L'entrée Markdown et la sortie partagent la fenêtre de contexte du modèle. Le backend accepte une valeur configurable jusqu'à `8192` tokens.
 
 Création :
 

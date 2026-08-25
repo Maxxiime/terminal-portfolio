@@ -11,6 +11,7 @@ import Welcome from "./commands/Welcome";
 import Lab from "./commands/Lab";
 import Language from "./commands/Language";
 import Question from "./commands/Question";
+import Projects from "./commands/Projects";
 import Skills from "./commands/Skills";
 import { OutputContainer, UsageDiv } from "./styles/Output.styled";
 import { termContext } from "./Terminal";
@@ -52,6 +53,7 @@ const Output: React.FC<Props> = ({ index, cmd }) => {
           help: <Help />,
           lab: <Lab />,
           language: <Language />,
+          projects: <Projects />,
           question: <Question />,
           skills: <Skills />,
           welcome: <Welcome />,

@@ -172,12 +172,52 @@ describe("Terminal Component", () => {
       );
     });
 
-    const otherCmds = ["about", "education", "help"];
+    const otherCmds = ["about", "education", "help", "projects"];
     otherCmds.forEach(cmd => {
       it(`should render ${cmd} component when user type '${cmd}' cmd`, async () => {
         await user.type(terminalInput, `${cmd}{enter}`);
         expect(screen.getByTestId(`${cmd}`)).toBeInTheDocument();
       });
+    });
+
+    it("should list every Markdown experience and open any role by number", async () => {
+      await user.type(terminalInput, "experience{enter}");
+
+      const list = screen.getByTestId("experience");
+      expect(list.textContent).toContain("Eidos-Montréal");
+      expect(list.textContent).toContain("Transdev");
+      expect(list.textContent).toContain("Orange");
+      expect(list.textContent).toContain("Keolis");
+      expect(list.textContent).toContain("IUT de Caen");
+      expect(list.textContent).toContain("Occasions Informatiques");
+
+      await user.type(terminalInput, "7{enter}");
+      expect(screen.getByTestId("experience-detail").textContent).toContain(
+        "Occasions Informatiques"
+      );
+    });
+
+    it("should disconnect and restart the terminal without leaving the page", async () => {
+      await user.type(terminalInput, "exit{enter}");
+
+      expect(screen.getByTestId("terminal-disconnected")).toBeInTheDocument();
+      expect(screen.queryByTitle("terminal-input")).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole("button", { name: "Restart console" }));
+      expect(screen.getByTitle("terminal-input")).toBeInTheDocument();
+      expect(screen.getByTestId("welcome")).toBeInTheDocument();
+    });
+
+    it("should read the about header and certification icons from Markdown", async () => {
+      await user.type(terminalInput, "about{enter}");
+      expect(screen.getByTestId("about").textContent).toContain(
+        "DevOps / SRE | Automation, Self-Hosting, AI-Driven Operations"
+      );
+
+      await user.type(terminalInput, "certification{enter}");
+      const icons = screen.getAllByRole("img");
+      expect(icons[0].getAttribute("src")).toBe("/brands/office365.svg");
+      expect(icons[1].getAttribute("src")).toBe("/brands/azure.svg");
     });
   });
 

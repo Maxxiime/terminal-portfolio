@@ -8,7 +8,7 @@ import { createQuestionApi, buildProviderPayload, readPrivateContext } from "./q
 
 const config = {
   person: { name: "Portfolio Owner" },
-  ai: { model: "configured-model" },
+  ai: { model: "configured-model", maxOutputTokens: 5000 },
 };
 
 test("injects private context server-side and removes client system messages", () => {
@@ -22,7 +22,7 @@ test("injects private context server-side and removes client system messages", (
   }, config, "Preferred email: owner@example.com");
 
   assert.equal(payload.model, "configured-model");
-  assert.equal(payload.max_tokens, 4096);
+  assert.equal(payload.max_tokens, 5000);
   assert.equal(payload.stream, false);
   assert.equal(payload.messages.length, 2);
   assert.match(payload.messages[0].content, /owner@example\.com/);
