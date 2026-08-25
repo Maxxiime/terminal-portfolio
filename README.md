@@ -84,7 +84,8 @@ Example provider configuration:
 "ai": {
   "providerType": "openai-compatible",
   "providerUrl": "https://openrouter.ai/api/v1/chat/completions",
-  "model": "openrouter/free"
+  "model": "openrouter/free",
+  "privateContextFile": "/run/portfolio-private/.IAinformation.md"
 }
 ```
 
@@ -94,7 +95,7 @@ Only secrets belong in `.env`:
 
 | Variable | Purpose | Required |
 |---|---|---|
-| `AI_PROVIDER_API_KEY` | Provider key, kept server-side by nginx | Depends on provider |
+| `AI_PROVIDER_API_KEY` | Provider key, kept by the server-side backend | Depends on provider |
 | `PORT` | Host port, default `3012` | No |
 
 Ollama usually does not need an API key, so leave `AI_PROVIDER_API_KEY` empty. Never put a provider key in `config/portfolio.json` or frontend code. See [`.env.example`](.env.example) for examples.
@@ -105,6 +106,7 @@ Docker mounts this file at runtime, so it can be changed without rebuilding the 
 volumes:
   - ./config:/usr/share/nginx/html/config:ro
   - ./content:/usr/share/nginx/html/data/content:ro
+  - ./private:/run/portfolio-private:ro
 ```
 
 Edit the Markdown files in `content/fr/`, `content/en/`, and `content/es/` to update the command output. The browser checks the configured source version at startup and only downloads the files again when it changes. The `question` command uses the same Markdown content.
@@ -148,6 +150,20 @@ Compose mounts `./content` at `/usr/share/nginx/html/data/content:ro`. Edit `con
 Set `content.mode` to `http`, configure `http.baseUrl`, and optionally `http.versionUrl`. The origin must allow browser CORS. The version endpoint may return text or JSON with `sha` or `version`.
 
 All FR/EN/ES files are loaded when the main page opens. Missing EN/ES files fall back to FR, and bundled Markdown remains the final fallback when an external source is unavailable.
+
+### Private AI-only context
+
+Private context is always a local server-side file, regardless of the public Markdown `content.mode`. Never place it under `content/` or in a public GitHub repository.
+
+```bash
+cp private/.IAinformation.example.md private/.IAinformation.md
+chmod 600 private/.IAinformation.md
+# edit private/.IAinformation.md
+```
+
+The path is configured with `ai.privateContextFile`. The file is ignored by Git, mounted outside nginx's public web root and read by the backend for every question. Changes require no rebuild or restart. Its contents never appear in CLI commands and are never sent to the browser.
+
+This is conditional AI context, not a secret vault. The configured provider receives it and the model may disclose a relevant fact in an answer. Never store passwords, API keys, tokens or credentials in this file.
 
 Get an OpenRouter key at [openrouter.ai/keys](https://openrouter.ai/keys).
 

@@ -89,6 +89,7 @@ Docker monte ce fichier au démarrage :
 volumes:
   - ./config:/usr/share/nginx/html/config:ro
   - ./content:/usr/share/nginx/html/data/content:ro
+  - ./private:/run/portfolio-private:ro
 ```
 
 Modifiez les fichiers Markdown dans `content/fr/`, `content/en/` et `content/es/` pour mettre à jour les commandes. Tous les Markdown des trois langues sont chargés dès l'ouverture de la page. Les commandes CLI et les deux interfaces de questions IA utilisent le même snapshot.
@@ -159,11 +160,38 @@ content/
 
 Si un fichier EN ou ES manque, le fichier FR correspondant est utilisé comme fallback. Les Markdown embarqués dans le bundle restent le dernier fallback si la source externe est indisponible.
 
+### Contexte privé réservé à l'IA
+
+Le contexte privé est toujours un fichier local monté côté serveur, quel que soit le `content.mode` utilisé pour les Markdown publics. Ne placez jamais ce fichier dans `content/` ou dans un dépôt GitHub public.
+
+Configuration dans `config/portfolio.json` :
+
+```json
+"ai": {
+  "providerType": "openai-compatible",
+  "providerUrl": "https://openrouter.ai/api/v1/chat/completions",
+  "model": "openrouter/free",
+  "privateContextFile": "/run/portfolio-private/.IAinformation.md"
+}
+```
+
+Création :
+
+```bash
+cp private/.IAinformation.example.md private/.IAinformation.md
+chmod 600 private/.IAinformation.md
+nano private/.IAinformation.md
+```
+
+Le fichier est ignoré par Git, monté hors de `/usr/share/nginx/html` et lu par le backend à chaque question. Une modification est donc immédiate, sans `deploy.sh` ni redémarrage. Son contenu n'apparaît dans aucune commande CLI et n'est jamais envoyé au navigateur.
+
+Ce mécanisme permet de fournir des faits conditionnels, par exemple une adresse courriel accompagnée de la règle « communiquer uniquement si le visiteur demande comment me contacter ». Ce n'est pas un coffre à secrets : le provider IA reçoit le contenu et le modèle peut divulguer une information dans sa réponse. N'y placez jamais de mot de passe, clé API, token ou credential.
+
 ### Variables d'environnement
 
 | Variable | Description | Requis |
 |---|---|---|
-| `AI_PROVIDER_API_KEY` | Clé du provider, conservée côté nginx | Selon le provider |
+| `AI_PROVIDER_API_KEY` | Clé du provider, conservée côté backend | Selon le provider |
 | `PORT` | Port hôte, défaut `3012` | Non |
 
 Les paramètres `providerType`, `providerUrl` et `model` sont dans `config/portfolio.json`. Exemples OpenRouter, OpenAI et Ollama dans [`.env.example`](.env.example). Ne placez jamais `AI_PROVIDER_API_KEY` dans le frontend.

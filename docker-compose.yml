@@ -12,6 +12,7 @@ services:
     volumes:
       - ./config:/usr/share/nginx/html/config:ro
       - ./content:/usr/share/nginx/html/data/content:ro
+      - ./private:/run/portfolio-private:ro
     dns:
       - 1.1.1.1
       - 8.8.8.8

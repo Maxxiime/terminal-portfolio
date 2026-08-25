@@ -17,3 +17,8 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .idea
+
+# Private AI-only context. Keep the template and instructions tracked.
+private/*
+!private/README.md
+!private/.IAinformation.example.md

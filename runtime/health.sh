@@ -27,6 +27,9 @@ if [ "$api_key_present" = "true" ] && [ "$dns_ok" = "true" ] && [ "$https_ok" = 
   overall_ok=true
 fi
 
+private_context_present=false
+[ -s "${AI_PRIVATE_CONTEXT_FILE:-/run/portfolio-private/.IAinformation.md}" ] && private_context_present=true
+
 cat > "$HEALTH_FILE" <<EOF
 {
   "ok": $overall_ok,
@@ -36,6 +39,7 @@ cat > "$HEALTH_FILE" <<EOF
   "outbound_https_ok": $https_ok,
   "provider_type": "${AI_PROVIDER_TYPE:-openai-compatible}",
   "provider_url": "${AI_PROVIDER_URL:-}",
-  "configured_model": "${AI_PROVIDER_MODEL:-}"
+  "configured_model": "${AI_PROVIDER_MODEL:-}",
+  "private_context_present": $private_context_present
 }
 EOF

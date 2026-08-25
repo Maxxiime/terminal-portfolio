@@ -89,6 +89,7 @@ Docker monta este archivo al iniciar:
 volumes:
   - ./config:/usr/share/nginx/html/config:ro
   - ./content:/usr/share/nginx/html/data/content:ro
+  - ./private:/run/portfolio-private:ro
 ```
 
 Edita los Markdown de `content/fr/`, `content/en/` y `content/es/` para actualizar los comandos. El navegador comprueba la versión configurada al iniciar y solo vuelve a descargar los archivos cuando cambia. El comando `question` usa el mismo contenido Markdown.
@@ -101,11 +102,22 @@ Edita los Markdown de `content/fr/`, `content/en/` y `content/es/` para actualiz
 
 Los archivos FR/EN/ES se cargan al abrir la página. Si falta un archivo EN o ES, se usa FR, y el Markdown incluido en el bundle queda como último fallback.
 
+### Contexto privado solo para la IA
+
+El contexto privado siempre es local al servidor, independientemente de `content.mode`. Crea `private/.IAinformation.md` desde el ejemplo. Git lo ignora, Docker lo monta fuera del directorio web y el backend lo lee en cada pregunta.
+
+```bash
+cp private/.IAinformation.example.md private/.IAinformation.md
+chmod 600 private/.IAinformation.md
+```
+
+Configura la ruta con `ai.privateContextFile: "/run/portfolio-private/.IAinformation.md"`. No es una bóveda de secretos: el provider recibe el contenido y el modelo puede divulgar un dato relevante. No guardes contraseñas, claves API, tokens ni credenciales.
+
 ### Variables de entorno
 
 | Variable | Descripción | Requerido |
 |---|---|---|
-| `AI_PROVIDER_API_KEY` | Clave del provider, conservada en nginx | Según el provider |
+| `AI_PROVIDER_API_KEY` | Clave del provider, conservada en el backend | Según el provider |
 | `PORT` | Puerto del host, por defecto `3012` | No |
 
 Los parámetros `providerType`, `providerUrl` y `model` están en `config/portfolio.json`. Los ejemplos OpenRouter, OpenAI y Ollama están en [`.env.example`](.env.example). Nunca pongas `AI_PROVIDER_API_KEY` en el frontend.
