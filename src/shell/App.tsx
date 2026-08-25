@@ -4,6 +4,7 @@ import remarkGfm from "remark-gfm";
 import { getMarkdownKnowledgeBase, loadMarkdownContent } from "../src/data/markdown";
 import {
   getPortfolioConfig,
+  getLocalizedText,
   initializeAnalytics,
   loadPortfolioConfig,
   type PortfolioRuntimeConfig,
@@ -227,8 +228,8 @@ export default function App() {
           <div className={`thread-content ${messages.length === 0 ? "thread-empty" : ""}`}>
             {messages.length === 0 && <div className="agent-home">
               <div className="prompt-logo"><TerminalIcon /></div>
-              <h2>{config.assistant.title || copy.title}</h2>
-              <p>{config.assistant.subtitle}</p>
+              <h2>{getLocalizedText(config.assistant.title, language, copy.title)}</h2>
+              <p>{getLocalizedText(config.assistant.subtitle, language)}</p>
               <div className="suggestions">{suggestions.map(suggestion => <button key={suggestion} disabled={!contentReady} onClick={() => void ask(suggestion)}>{suggestion}</button>)}</div>
             </div>}
             <div className="message-list">
@@ -252,7 +253,7 @@ export default function App() {
               <div className="composer-actions"><span>{contentReady ? `${copy.source} · ${sourceLabel}` : copy.loading}</span><button disabled={!question.trim() || isLoading || !contentReady} type="submit" aria-label={copy.send}><ArrowIcon /></button></div>
             </div>
           </form>
-          <p className="disclaimer">{config.assistant.disclaimer}</p>
+          <p className="disclaimer">{getLocalizedText(config.assistant.disclaimer, language)}</p>
         </footer>
       </section>
 
@@ -264,7 +265,7 @@ export default function App() {
       </div>
 
       <section className={`terminal-panel ${activePanel === "terminal" ? "mobile-active" : ""}`}>
-        <header className="terminal-bar"><div className="window-dots"><i /><i /><i /></div><span>{config.portfolioLabel}</span><span className="secure">● local</span></header>
+        <header className="terminal-bar"><div className="window-dots"><i /><i /><i /></div><span>{config.portfolioLabel}</span></header>
         {contentReady ? <iframe className="portfolio-frame" src="/portfolio-cli/index.html" title={copy.terminal} allow="clipboard-write" /> : <div className="terminal-loading">{copy.loading}</div>}
       </section>
     </main>

@@ -45,7 +45,7 @@ Un portfolio interactivo estilo terminal con preguntas y respuestas impulsadas p
 ├── src/              # Fuente React/Vite
 │   ├── src/
 │   │   ├── components/
-│   │   ├── data/profile.ts   ← todo el contenido personal está aquí
+│   │   ├── data/profile.ts   ← fallback estructurado y metadatos del CLI
 │   │   └── i18n.ts           ← cadenas UI (fr/en/es)
 │   └── public/
 │       ├── cv/               ← coloque su PDF aquí
@@ -82,6 +82,8 @@ Una sola imagen Docker contiene ahora la interfaz split-screen completa: asisten
 ## 🔧 Configuración
 
 El archivo único para toda la configuración no secreta es [`config/portfolio.json`](config/portfolio.json). Contiene el nombre, hostname del terminal, textos del asistente, metadatos SEO, preguntas, provider IA, Umami y fuente Markdown.
+
+Este archivo debe ser **JSON estricto**: no admite comentarios `//` ni `/* ... */`. Mantén las secciones `github`, `http` y `local` sin comentarlas; solo se utiliza la sección elegida por `content.mode`. Los textos que dependen del idioma, como `assistant.title`, aceptan un objeto `{ "fr": "...", "en": "...", "es": "..." }`.
 
 Docker monta este archivo al iniciar:
 
@@ -169,8 +171,10 @@ Utiliza estos archivos:
 | [`content/fr/`](content/fr/) | Contenido francés y conocimiento IA |
 | [`content/en/`](content/en/) | Contenido inglés y conocimiento IA |
 | [`content/es/`](content/es/) | Contenido español y conocimiento IA |
-| [`src/src/data/profile.ts`](src/src/data/profile.ts) | Fallback estructurado, contactos, experiencia, proyectos y CV |
+| [`src/src/data/profile.ts`](src/src/data/profile.ts) | Fallback estructurado y metadatos que aún usa el CLI (contactos, CV, iconos y comandos) |
 | [`src/src/i18n.ts`](src/src/i18n.ts) | Textos de la interfaz del terminal |
+
+`profile.ts` sigue siendo necesario. Los Markdown son la fuente editorial de los comandos y de la IA, pero este archivo todavía aporta fallbacks y datos estructurados a varios componentes del CLI. No lo elimines hasta migrar todos esos componentes a Markdown y `portfolio.json`.
 
 Campos clave al inicio de `profile.ts`:
 

@@ -1,9 +1,10 @@
 import type { Locale } from "../i18n";
 
 export type ContentMode = "github" | "http" | "local";
+export type LocalizedText = string | Partial<Record<Locale, string>>;
 export type PortfolioRuntimeConfig = {
   person: { name: string; firstName: string; terminalHost: string };
-  assistant: { displayName: string; uri: string; title: string; subtitle: string; disclaimer: string };
+  assistant: { displayName: string; uri: string; title: LocalizedText; subtitle: LocalizedText; disclaimer: LocalizedText };
   portfolioLabel: string;
   ai: { providerType: string; providerUrl: string; model: string; privateContextFile: string };
   analytics: { umamiUrl: string; websiteId: string };
@@ -22,7 +23,11 @@ export const defaultPortfolioConfig: PortfolioRuntimeConfig = {
   assistant: {
     displayName: "Portfolio Assistant",
     uri: "assistant://portfolio",
-    title: "What would you like to know?",
+    title: {
+      fr: "Que voulez-vous savoir ?",
+      en: "What would you like to know?",
+      es: "¿Qué quieres saber?",
+    },
     subtitle: "Markdown content · AI-assisted answers",
     disclaimer: "Markdown content · AI-generated answers",
   },
@@ -51,6 +56,11 @@ export const defaultPortfolioConfig: PortfolioRuntimeConfig = {
 let runtimeConfig = defaultPortfolioConfig;
 
 export const getPortfolioConfig = () => runtimeConfig;
+
+export const getLocalizedText = (value: LocalizedText, locale: Locale, fallback = "") => {
+  if (typeof value === "string") return value || fallback;
+  return value[locale] || value.fr || value.en || value.es || fallback;
+};
 
 const mergeConfig = (
   input: Partial<PortfolioRuntimeConfig>,

@@ -45,7 +45,7 @@ An interactive terminal-style portfolio with AI-powered Q&A, multilingual suppor
 ├── src/              # React/Vite source
 │   ├── src/
 │   │   ├── components/
-│   │   ├── data/profile.ts   ← all personal content lives here
+│   │   ├── data/profile.ts   ← structured CLI fallback and metadata
 │   │   └── i18n.ts           ← UI strings (fr/en/es)
 │   └── public/
 │       ├── cv/               ← put your CV PDF here
@@ -77,6 +77,8 @@ One Docker image now contains the complete split-screen interface: AI assistant 
 ## 🔧 Configuration: one source for non-secrets
 
 Edit [`config/portfolio.json`](config/portfolio.json) for every non-secret setting: person name, terminal hostname, assistant labels, SEO text, suggested questions, AI provider, Umami and Markdown source.
+
+This file must remain **strict JSON**: `//` and `/* ... */` comments are not allowed. Keep the `github`, `http`, and `local` sections present without commenting them out; only the section selected by `content.mode` is used. Language-dependent labels such as `assistant.title` accept an object like `{ "fr": "...", "en": "...", "es": "..." }`.
 
 Example provider configuration:
 
@@ -212,8 +214,10 @@ Use these files when adapting the portfolio to a new person:
 | [`content/fr/`](content/fr/) | French command content and AI knowledge |
 | [`content/en/`](content/en/) | English command content and AI knowledge |
 | [`content/es/`](content/es/) | Spanish command content and AI knowledge |
-| [`src/src/data/profile.ts`](src/src/data/profile.ts) | Structured fallback data, contact links, experience, projects, and CV path |
+| [`src/src/data/profile.ts`](src/src/data/profile.ts) | Structured fallback and CLI metadata still used by contacts, CV, icons, and commands |
 | [`src/src/i18n.ts`](src/src/i18n.ts) | Terminal UI strings in the three languages |
+
+`profile.ts` is still required. Markdown is the editorial source for commands and AI answers, while this file still supplies fallback and structured data to several CLI components. Do not remove it until those components have all been migrated to Markdown and `portfolio.json`.
 
 Key fields at the top of `profile.ts`:
 

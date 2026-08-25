@@ -7,7 +7,11 @@
   "assistant": {
     "displayName": "Assistant de Maxime",
     "uri": "maxime://assistant",
-    "title": "Que voulez-vous savoir sur Maxime ?",
+    "title": {
+      "fr": "Que voulez-vous savoir sur Maxime ?",
+      "en": "What would you like to know about Maxime?",
+      "es": "¿Qué quieres saber sobre Maxime?"
+    },
     "subtitle": "DevOps · SRE · Automatisation · Self-hosting · AI Ops",
     "disclaimer": "Markdown portfolio · réponses générées par IA"
   },

@@ -1,48 +1,23 @@
 import type { Locale } from "../i18n";
-import aboutFr from "../../../content/fr/about.md?raw";
-import aiFr from "../../../content/fr/ai.md?raw";
-import certificationFr from "../../../content/fr/certification.md?raw";
-import educationFr from "../../../content/fr/education.md?raw";
-import experienceFr from "../../../content/fr/experience.md?raw";
-import labFr from "../../../content/fr/lab.md?raw";
-import projectsFr from "../../../content/fr/projects.md?raw";
-import skillsFr from "../../../content/fr/skills.md?raw";
-import welcomeFr from "../../../content/fr/welcome.md?raw";
-import aboutEn from "../../../content/en/about.md?raw";
-import aiEn from "../../../content/en/ai.md?raw";
-import certificationEn from "../../../content/en/certification.md?raw";
-import educationEn from "../../../content/en/education.md?raw";
-import experienceEn from "../../../content/en/experience.md?raw";
-import labEn from "../../../content/en/lab.md?raw";
-import projectsEn from "../../../content/en/projects.md?raw";
-import skillsEn from "../../../content/en/skills.md?raw";
-import welcomeEn from "../../../content/en/welcome.md?raw";
-import aboutEs from "../../../content/es/about.md?raw";
-import aiEs from "../../../content/es/ai.md?raw";
-import certificationEs from "../../../content/es/certification.md?raw";
-import educationEs from "../../../content/es/education.md?raw";
-import experienceEs from "../../../content/es/experience.md?raw";
-import labEs from "../../../content/es/lab.md?raw";
-import projectsEs from "../../../content/es/projects.md?raw";
-import skillsEs from "../../../content/es/skills.md?raw";
-import welcomeEs from "../../../content/es/welcome.md?raw";
 import { loadPortfolioConfig } from "./portfolio-config";
 
 export type MarkdownTopic = "about" | "ai" | "certification" | "education" | "experience" | "lab" | "projects" | "skills" | "welcome";
 type MarkdownByLocale = Partial<Record<Locale, string>>;
 const CONTENT_CACHE_KEY = "terminal-portfolio-markdown-cache";
+const locales: Locale[] = ["fr", "en", "es"];
+const topics: MarkdownTopic[] = ["about", "ai", "certification", "education", "experience", "lab", "projects", "skills", "welcome"];
+const bundledMarkdown = import.meta.glob("../../../content/*/*.md", {
+  eager: true,
+  as: "raw",
+}) as Record<string, string>;
 
-const documents: Record<MarkdownTopic, MarkdownByLocale> = {
-  about: { fr: aboutFr, en: aboutEn, es: aboutEs },
-  ai: { fr: aiFr, en: aiEn, es: aiEs },
-  certification: { fr: certificationFr, en: certificationEn, es: certificationEs },
-  education: { fr: educationFr, en: educationEn, es: educationEs },
-  experience: { fr: experienceFr, en: experienceEn, es: experienceEs },
-  lab: { fr: labFr, en: labEn, es: labEs },
-  projects: { fr: projectsFr, en: projectsEn, es: projectsEs },
-  skills: { fr: skillsFr, en: skillsEn, es: skillsEs },
-  welcome: { fr: welcomeFr, en: welcomeEn, es: welcomeEs },
-};
+const documents = Object.fromEntries(topics.map(topic => [
+  topic,
+  Object.fromEntries(locales.flatMap(locale => {
+    const value = bundledMarkdown[`../../../content/${locale}/${topic}.md`];
+    return value ? [[locale, value]] : [];
+  })),
+])) as Record<MarkdownTopic, MarkdownByLocale>;
 
 export const getMarkdownDocument = (locale: Locale, topic: MarkdownTopic) => documents[topic][locale] ?? documents[topic].fr ?? "";
 
@@ -126,7 +101,6 @@ export async function loadMarkdownContent() {
     return;
   }
 
-  const locales = ["fr", "en", "es"] as Locale[];
   const topics = Object.keys(documents) as MarkdownTopic[];
   const loaded = await Promise.all(locales.flatMap(locale => topics.map(async topic => {
     for (const candidate of locale === "fr" ? [locale] : [locale, "fr" as Locale]) {

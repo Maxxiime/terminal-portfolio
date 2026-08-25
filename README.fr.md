@@ -45,7 +45,7 @@ Un portfolio interactif en style terminal avec Q&R alimentée par IA, support mu
 ├── src/              # Source React/Vite
 │   ├── src/
 │   │   ├── components/
-│   │   ├── data/profile.ts   ← tout le contenu personnel est ici
+│   │   ├── data/profile.ts   ← fallback structuré et métadonnées du CLI
 │   │   └── i18n.ts           ← chaînes UI (fr/en/es)
 │   └── public/
 │       ├── cv/               ← déposez votre PDF ici
@@ -82,6 +82,8 @@ Une seule image Docker contient maintenant l'interface split-screen complète : 
 ## 🔧 Configuration
 
 Le fichier unique à modifier pour les réglages non secrets est [`config/portfolio.json`](config/portfolio.json). Il contient le nom, le hostname du terminal, les textes de l'assistant, les métadonnées SEO, les questions, le provider IA, Umami et la source Markdown.
+
+Ce fichier doit rester du **JSON strict** : les commentaires `//` et `/* ... */` ne sont pas autorisés. Gardez les sections `github`, `http` et `local` présentes sans les commenter ; seule celle sélectionnée par `content.mode` est utilisée. Les textes qui changent avec la langue, comme `assistant.title`, acceptent un objet `{ "fr": "...", "en": "...", "es": "..." }`.
 
 Docker monte ce fichier au démarrage :
 
@@ -243,8 +245,10 @@ Utilisez ces fichiers :
 | [`content/fr/`](content/fr/) | Contenu français et connaissances IA |
 | [`content/en/`](content/en/) | Contenu anglais et connaissances IA |
 | [`content/es/`](content/es/) | Contenu espagnol et connaissances IA |
-| [`src/src/data/profile.ts`](src/src/data/profile.ts) | Fallback structuré, contacts, expérience, projets et CV |
+| [`src/src/data/profile.ts`](src/src/data/profile.ts) | Fallback structuré et métadonnées encore nécessaires au CLI (contacts, CV, icônes et commandes) |
 | [`src/src/i18n.ts`](src/src/i18n.ts) | Chaînes UI du terminal |
+
+`profile.ts` est toujours utilisé. Les Markdown sont la source éditoriale des commandes et de l'IA, tandis que ce fichier fournit encore les fallbacks et données structurées nécessaires à plusieurs composants du CLI. Il ne faut donc pas le supprimer tant que ces composants n'ont pas tous été migrés vers les Markdown et `portfolio.json`.
 
 Champs clés en haut de `profile.ts` :
 
