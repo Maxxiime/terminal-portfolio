@@ -1,7 +1,7 @@
 #!/bin/sh
 # Runs via /docker-entrypoint.d/ at container startup — generates /health.json
 
-HEALTH_FILE=/usr/share/nginx/html/health.json
+HEALTH_FILE="${PORTFOLIO_HEALTH_FILE:-/usr/share/nginx/html/health.json}"
 
 api_key_present=false
 [ -n "${AI_PROVIDER_API_KEY:-}" ] && api_key_present=true
@@ -16,7 +16,8 @@ fi
 
 https_ok=false
 https_status="000"
-if wget -q --spider -T 10 "${AI_PROVIDER_URL:-https://openrouter.ai}" 2>/dev/null; then
+provider_origin=$(printf '%s' "${AI_PROVIDER_URL:-}" | sed -E 's#(https?://[^/]+).*#\1#')
+if wget -q --spider -T 10 "${provider_origin:-https://openrouter.ai}" 2>/dev/null; then
   https_ok=true
   https_status="200"
 fi
@@ -33,6 +34,7 @@ cat > "$HEALTH_FILE" <<EOF
   "dns_resolution_ok": $dns_ok,
   "dns_first_result": "$dns_first",
   "outbound_https_ok": $https_ok,
+  "provider_type": "${AI_PROVIDER_TYPE:-openai-compatible}",
   "provider_url": "${AI_PROVIDER_URL:-}",
   "configured_model": "${AI_PROVIDER_MODEL:-}"
 }

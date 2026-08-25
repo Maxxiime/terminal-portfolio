@@ -77,7 +77,7 @@ cp .env.example .env
 
 Le portfolio est disponible sur `http://localhost:3012` (ou le PORT configuré).
 
-> Ce dépôt construit le CLI terminal autonome. Le site split-screen assistant + CLI est une application Sites séparée qui embarque ce CLI au build ; lancer `deploy.sh` dans ce dépôt affiche donc uniquement le CLI.
+Une seule image Docker contient maintenant l'interface split-screen complète : assistant IA à gauche, séparateur redimensionnable et CLI local à droite. Le CLI est servi depuis `/portfolio-cli/` sans dépendre d'un autre domaine.
 
 ## 🔧 Configuration
 
@@ -91,7 +91,66 @@ volumes:
   - ./data/content:/usr/share/nginx/html/data/content:ro
 ```
 
-Modifiez les fichiers Markdown dans `content/fr/`, `content/en/` et `content/es/` pour mettre à jour les commandes. Le navigateur vérifie la version configurée au démarrage et ne retélécharge les fichiers qu'en cas de changement. La commande `question` utilise les mêmes Markdown.
+Modifiez les fichiers Markdown dans `content/fr/`, `content/en/` et `content/es/` pour mettre à jour les commandes. Tous les Markdown des trois langues sont chargés dès l'ouverture de la page. Les commandes CLI et les deux interfaces de questions IA utilisent le même snapshot.
+
+### Hébergement des fichiers Markdown
+
+La méthode est choisie avec `content.mode` dans `config/portfolio.json`.
+
+#### 1. GitHub public
+
+```json
+"content": {
+  "mode": "github",
+  "github": {
+    "owner": "Maxxiime",
+    "repo": "terminal-portfolio",
+    "ref": "main",
+    "path": "content"
+  }
+}
+```
+
+Le dépôt doit être public : aucune clé GitHub n'est envoyée au navigateur. Le SHA du dernier commit sert de version. Après un commit Markdown, rechargez la page ; aucun rebuild Docker n'est nécessaire.
+
+#### 2. HTTP, HTTPS, S3 ou CDN
+
+```json
+"content": {
+  "mode": "http",
+  "http": {
+    "baseUrl": "https://static.example.com/portfolio/content",
+    "versionUrl": "https://static.example.com/portfolio/version.json"
+  }
+}
+```
+
+Le stockage doit servir les fichiers publiquement avec CORS autorisé. `versionUrl` est optionnel et peut retourner du texte ou un JSON contenant `sha` ou `version`. Sans URL de version, les Markdown sont relus à chaque ouverture de page.
+
+#### 3. Dossier local monté dans le container
+
+```json
+"content": {
+  "mode": "local",
+  "local": {
+    "baseUrl": "/data/content",
+    "versionUrl": ""
+  }
+}
+```
+
+Le Compose monte déjà `./data/content` vers `/usr/share/nginx/html/data/content:ro`. Modifiez par exemple `data/content/fr/about.md`, puis rechargez la page. Aucun accès GitHub, rebuild, `deploy.sh` ou redémarrage du container n'est nécessaire.
+
+Structure attendue pour chaque méthode :
+
+```text
+content/
+├── fr/{welcome,about,skills,lab,experience,projects,education,certification,ai}.md
+├── en/{welcome,about,skills,lab,experience,projects,education,certification,ai}.md
+└── es/{welcome,about,skills,lab,experience,projects,education,certification,ai}.md
+```
+
+Si un fichier EN ou ES manque, le fichier FR correspondant est utilisé comme fallback. Les Markdown embarqués dans le bundle restent le dernier fallback si la source externe est indisponible.
 
 ### Variables d'environnement
 
@@ -133,7 +192,8 @@ docker compose up -d --build
 
 | Chemin            | Description              |
 |-------------------|--------------------------|
-| `/`               | SPA du portfolio terminal |
+| `/`               | Split-screen assistant IA + CLI |
+| `/portfolio-cli/` | CLI local embarqué dans la même image |
 | `/health`         | JSON de vérification de santé |
 | `/cv/resume.pdf`  | PDF du CV                |
 | `/api/question`   | Proxy du provider configuré (POST)  |

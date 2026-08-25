@@ -8,6 +8,7 @@ import { languageContext } from "../../App";
 import { answerLanguageNames, uiText } from "../../i18n";
 import LinkifiedText from "../LinkifiedText";
 import { getPortfolioConfig } from "../../data/portfolio-config";
+import { createRequestId } from "../../utils/request-id";
 
 const UsageHint = styled.span`
   color: ${({ theme }) => theme.colors?.secondary};
@@ -188,7 +189,7 @@ const Question: React.FC = () => {
 
     if (!question) return;
 
-    const requestId = crypto.randomUUID();
+    const requestId = createRequestId();
     let cancelled = false;
     setState({ status: "loading", answer: "" });
 

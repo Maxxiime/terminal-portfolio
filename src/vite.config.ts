@@ -5,19 +5,25 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
+const embedded = process.env.PORTFOLIO_EMBEDDED === "1";
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: process.env.PORTFOLIO_EMBEDDED === "1" ? "/portfolio-cli/" : "/",
+  base: embedded ? "/portfolio-cli/" : "/",
+  publicDir: embedded ? false : "public",
   plugins: [
     react(),
-    VitePWA({
+    ...(!embedded ? [VitePWA({
       registerType: "autoUpdate",
       manifest: false,
       workbox: {
         navigateFallbackDenylist: [/^\/health$/, /^\/cv\//],
       },
-    }),
+    })] : []),
   ],
+  build: embedded
+    ? { outDir: "dist/portfolio-cli", emptyOutDir: false }
+    : undefined,
   test: {
     globals: true,
     environment: 'jsdom',

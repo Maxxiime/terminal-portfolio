@@ -1,8 +1,12 @@
 FROM nginx:alpine
 ENV NODE_OPTIONS="--dns-result-order=ipv4first"
-RUN apk add --no-cache jq
-COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+RUN apk add --no-cache gettext jq
+COPY nginx.conf.template /etc/portfolio/default.conf.template
 COPY dist/ /usr/share/nginx/html/
-COPY health.sh /docker-entrypoint.d/99-generate-health.sh
-COPY config.sh /docker-entrypoint.d/98-generate-runtime-config.sh
+COPY config.sh /usr/local/bin/portfolio-config.sh
+COPY health.sh /usr/local/bin/portfolio-health.sh
+COPY entrypoint.sh /usr/local/bin/portfolio-entrypoint.sh
+RUN chmod +x /usr/local/bin/portfolio-entrypoint.sh /usr/local/bin/portfolio-health.sh
 EXPOSE 80
+ENTRYPOINT ["/usr/local/bin/portfolio-entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]

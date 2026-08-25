@@ -72,7 +72,7 @@ cp .env.example .env
 
 The portfolio is available at `http://localhost:3012` (or the host port selected with `PORT`).
 
-> This repository builds the standalone terminal CLI. The split-screen assistant + CLI website is a separate Sites application that embeds this CLI at build time; running this repository's `deploy.sh` therefore shows the CLI panel only.
+One Docker image now contains the complete split-screen interface: AI assistant on the left, resizable separator, and the local CLI on the right. The CLI is served from `/portfolio-cli/` without depending on another domain.
 
 ## 🔧 Configuration: one source for non-secrets
 
@@ -109,6 +109,14 @@ volumes:
 
 Edit the Markdown files in `content/fr/`, `content/en/`, and `content/es/` to update the command output. The browser checks the configured source version at startup and only downloads the files again when it changes. The `question` command uses the same Markdown content.
 
+### Markdown hosting methods
+
+- **Public GitHub** — set `content.mode` to `github` and configure `owner`, `repo`, `ref`, and `path`. No token is sent, so the repository must be public. The commit SHA is used for version checks.
+- **HTTP/HTTPS, S3 or CDN** — set `content.mode` to `http`, configure `baseUrl`, and optionally `versionUrl`. The origin must allow browser CORS. The version endpoint may return text or JSON with `sha` or `version`.
+- **Local Docker volume** — set `content.mode` to `local` with `baseUrl: "/data/content"`. Compose already mounts `./data/content` read-only. Edit a file and reload the page; no rebuild or container restart is required.
+
+All FR/EN/ES files are loaded when the main page opens. Missing EN/ES files fall back to FR, and bundled Markdown remains the final fallback when an external source is unavailable.
+
 Get an OpenRouter key at [openrouter.ai/keys](https://openrouter.ai/keys).
 
 ## 🧑‍💻 Development
@@ -140,7 +148,8 @@ docker compose up -d --build
 
 | Path              | Description             |
 |-------------------|-------------------------|
-| `/`               | Terminal portfolio SPA  |
+| `/`               | Split-screen AI assistant + CLI |
+| `/portfolio-cli/` | Embedded local CLI |
 | `/health`         | Health check JSON       |
 | `/cv/resume.pdf`  | CV PDF                  |
 | `/api/question`   | Configured provider proxy (POST) |

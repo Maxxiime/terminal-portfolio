@@ -1,7 +1,6 @@
 #!/bin/sh
-set -eu
 
-config_file=/usr/share/nginx/html/config/portfolio.json
+config_file="${PORTFOLIO_CONFIG_FILE:-/usr/share/nginx/html/config/portfolio.json}"
 
 if [ ! -r "$config_file" ]; then
   echo "Missing portfolio configuration: $config_file" >&2
@@ -17,7 +16,8 @@ if [ -z "$provider_url" ] || [ -z "$provider_model" ]; then
   exit 1
 fi
 
-# These exported values are consumed by nginx's envsubst template and health.sh.
+# This file is sourced by entrypoint.sh, so the exports remain available to
+# nginx template generation and health.sh.
 export AI_PROVIDER_URL="$provider_url"
 export AI_PROVIDER_MODEL="$provider_model"
 export AI_PROVIDER_TYPE="${provider_type:-openai-compatible}"

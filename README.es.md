@@ -77,7 +77,7 @@ cp .env.example .env
 
 El portfolio está disponible en `http://localhost:3012` (o el PORT configurado).
 
-> Este repositorio construye el CLI terminal independiente. El sitio split-screen assistant + CLI es una aplicación Sites separada que incluye este CLI durante el build; ejecutar `deploy.sh` en este repositorio muestra únicamente el CLI.
+Una sola imagen Docker contiene ahora la interfaz split-screen completa: asistente IA a la izquierda, separador redimensionable y CLI local a la derecha. El CLI se sirve desde `/portfolio-cli/` sin depender de otro dominio.
 
 ## 🔧 Configuración
 
@@ -92,6 +92,14 @@ volumes:
 ```
 
 Edita los Markdown de `content/fr/`, `content/en/` y `content/es/` para actualizar los comandos. El navegador comprueba la versión configurada al iniciar y solo vuelve a descargar los archivos cuando cambia. El comando `question` usa el mismo contenido Markdown.
+
+### Métodos de hosting de Markdown
+
+- **GitHub público** — usa `content.mode: "github"` y configura `owner`, `repo`, `ref` y `path`. No se envía token, por lo que el repositorio debe ser público.
+- **HTTP/HTTPS, S3 o CDN** — usa `content.mode: "http"`, configura `baseUrl` y opcionalmente `versionUrl`. El origen debe permitir CORS.
+- **Volumen Docker local** — usa `content.mode: "local"` con `baseUrl: "/data/content"`. Compose ya monta `./data/content`; solo hace falta editar el archivo y recargar la página.
+
+Los archivos FR/EN/ES se cargan al abrir la página. Si falta un archivo EN o ES, se usa FR, y el Markdown incluido en el bundle queda como último fallback.
 
 ### Variables de entorno
 
@@ -133,7 +141,8 @@ docker compose up -d --build
 
 | Ruta              | Descripción                  |
 |-------------------|------------------------------|
-| `/`               | SPA del portfolio terminal   |
+| `/`               | Split-screen asistente IA + CLI |
+| `/portfolio-cli/` | CLI local incluido |
 | `/health`         | JSON de verificación de salud |
 | `/cv/resume.pdf`  | PDF del CV                   |
 | `/api/question`   | Proxy del provider configurado (POST)      |
