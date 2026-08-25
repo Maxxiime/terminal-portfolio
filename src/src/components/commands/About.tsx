@@ -8,13 +8,15 @@ import {
   AboutWrapper,
 } from "../styles/About.styled";
 import { getAboutSections, getProfile } from "../../data/profile";
+import { getMarkdownSections } from "../../data/markdown";
 import { useContext } from "react";
 import { languageContext } from "../../App";
 
 const About: React.FC = () => {
   const { locale } = useContext(languageContext);
   const profile = getProfile(locale);
-  const aboutSections = getAboutSections(locale);
+  const markdownSections = locale === "fr" ? getMarkdownSections(locale, "about") : [];
+  const aboutSections = markdownSections.length ? markdownSections.flatMap(section => section.paragraphs) : getAboutSections(locale);
 
   return (
     <AboutWrapper data-testid="about">
