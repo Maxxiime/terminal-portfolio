@@ -5,12 +5,16 @@ import {
   HelpWrapper,
 } from "../styles/Help.styled";
 import { getSkillGroups } from "../../data/profile";
+import { getMarkdownSections } from "../../data/markdown";
 import { useContext } from "react";
 import { languageContext } from "../../App";
 
 const Skills: React.FC = () => {
   const { locale } = useContext(languageContext);
-  const skillGroups = getSkillGroups(locale);
+  const markdownGroups = locale === "fr" ? getMarkdownSections(locale, "skills") : [];
+  const skillGroups = markdownGroups.length
+    ? markdownGroups.filter(group => group.title && group.items.length).map(group => ({ name: group.title, items: group.items }))
+    : getSkillGroups(locale);
 
   return (
     <HelpWrapper data-testid="skills">
