@@ -88,16 +88,16 @@ Docker monta este archivo al iniciar:
 ```yaml
 volumes:
   - ./config:/usr/share/nginx/html/config:ro
-  - ./data/content:/usr/share/nginx/html/data/content:ro
+  - ./content:/usr/share/nginx/html/data/content:ro
 ```
 
 Edita los Markdown de `content/fr/`, `content/en/` y `content/es/` para actualizar los comandos. El navegador comprueba la versión configurada al iniciar y solo vuelve a descargar los archivos cuando cambia. El comando `question` usa el mismo contenido Markdown.
 
 ### Métodos de hosting de Markdown
 
-- **GitHub público** — usa `content.mode: "github"` y configura `owner`, `repo`, `ref` y `path`. No se envía token, por lo que el repositorio debe ser público.
+- **GitHub público** — usa `content.mode: "github"` y configura `owner`, `repo`, `ref` y `path`. No se envía token, por lo que el repositorio debe ser público. Al abrir la página, el navegador comprueba el SHA y, si cambia, vuelve a descargar los 27 Markdown FR/EN/ES. No hace falta `deploy.sh`.
 - **HTTP/HTTPS, S3 o CDN** — usa `content.mode: "http"`, configura `baseUrl` y opcionalmente `versionUrl`. El origen debe permitir CORS.
-- **Volumen Docker local** — usa `content.mode: "local"` con `baseUrl: "/data/content"`. Compose ya monta `./data/content`; solo hace falta editar el archivo y recargar la página.
+- **Volumen Docker local** — usa `content.mode: "local"` con `baseUrl: "/data/content"`. Compose monta `./content`; solo hace falta editar el archivo y recargar la página.
 
 Los archivos FR/EN/ES se cargan al abrir la página. Si falta un archivo EN o ES, se usa FR, y el Markdown incluido en el bundle queda como último fallback.
 
@@ -174,9 +174,9 @@ Las cadenas UI (3 idiomas) están en [`src/src/i18n.ts`](src/src/i18n.ts).
 
 Para reemplazar el CV: coloque su PDF en `src/public/cv/` con el nombre `resume.pdf` y actualice `cvUrl` en `profile.ts`.
 
-En modo local, define `content.mode` como `local`, usa `/data/content` en `config/portfolio.json` y coloca los archivos en `data/content/<locale>/`. El repositorio GitHub debe ser público porque no se usa ningún token.
+En modo local, define `content.mode` como `local`, usa `/data/content` en `config/portfolio.json` y modifica los archivos en `content/<locale>/`. El repositorio GitHub debe ser público porque no se usa ningún token.
 
-Para probar un cambio local, edita `data/content/fr/about.md`, recarga la página y ejecuta `about`. No hace falta reconstruir la imagen, reiniciar Compose ni ejecutar `deploy.sh`. En modo GitHub, haz commit del Markdown en la rama pública configurada y recarga la página; no hace falta redeploy. Solo se necesita rebuild al modificar la aplicación o usar contenido incluido en la imagen.
+Para probar un cambio local, edita `content/fr/about.md`, recarga la página y ejecuta `about`. No hace falta reconstruir la imagen, reiniciar Compose ni ejecutar `deploy.sh`. En modo GitHub, haz commit del Markdown en la rama pública configurada y recarga la página; no hace falta redeploy. Solo se necesita rebuild al modificar la aplicación o usar contenido incluido en la imagen.
 
 ## 🔄 Reverse proxy (nginx / NPM)
 

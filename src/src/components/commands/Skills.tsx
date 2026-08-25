@@ -11,7 +11,7 @@ import { languageContext } from "../../App";
 
 const Skills: React.FC = () => {
   const { locale } = useContext(languageContext);
-  const markdownGroups = locale === "fr" ? getMarkdownSections(locale, "skills") : [];
+  const markdownGroups = getMarkdownSections(locale, "skills");
   const skillGroups = markdownGroups.length
     ? markdownGroups.filter(group => group.title && group.items.length).map(group => ({ name: group.title, items: group.items }))
     : getSkillGroups(locale);

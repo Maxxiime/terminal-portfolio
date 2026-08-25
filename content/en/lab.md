@@ -1,8 +1,8 @@
 # Self-Hosted Infrastructure, Automation & AI Lab
 
-2014 - Présent
+2014 – Present
 
-Construit et enrichi en continu depuis 2014, ce lab personnel est centré sur l'infrastructure self-hosted, l'automatisation, les workflows assistés par l'IA et les intégrations smart home avancées. Au fil du temps, il est devenu un environnement réel utilisé pour expérimenter la virtualisation, les conteneurs, le stockage, le monitoring, les sauvegardes, l'identité, le réseau, les outils LLM locaux, les workflows à base d'agents et des intégrations sur mesure. Il comprend aussi de petites applications utilitaires et des pipelines d'automatisation pensés pour répondre à des besoins concrets, avec un fort accent sur la fiabilité, l'autonomie et la maintenabilité long terme.
+Built and continuously evolved a personal lab since 2014, centered on self-hosted infrastructure, automation, AI-assisted workflows and advanced smart home integrations. Over time, it has grown into a real-world environment used to experiment with virtualization, containers, storage, monitoring, backup, identity, networking, local LLM tools, agent-based workflows and custom integrations. It also includes small utility applications and automation pipelines designed to solve practical needs, with a strong focus on reliability, autonomy and long-term maintainability.
 
 ## Infrastructure
 

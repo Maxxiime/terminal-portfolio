@@ -15,7 +15,7 @@ import { languageContext } from "../../App";
 const About: React.FC = () => {
   const { locale } = useContext(languageContext);
   const profile = getProfile(locale);
-  const markdownSections = locale === "fr" ? getMarkdownSections(locale, "about") : [];
+  const markdownSections = getMarkdownSections(locale, "about");
   const aboutSections = markdownSections.length ? markdownSections.flatMap(section => section.paragraphs) : getAboutSections(locale);
 
   return (

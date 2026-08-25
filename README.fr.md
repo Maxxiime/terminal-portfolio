@@ -88,14 +88,14 @@ Docker monte ce fichier au démarrage :
 ```yaml
 volumes:
   - ./config:/usr/share/nginx/html/config:ro
-  - ./data/content:/usr/share/nginx/html/data/content:ro
+  - ./content:/usr/share/nginx/html/data/content:ro
 ```
 
 Modifiez les fichiers Markdown dans `content/fr/`, `content/en/` et `content/es/` pour mettre à jour les commandes. Tous les Markdown des trois langues sont chargés dès l'ouverture de la page. Les commandes CLI et les deux interfaces de questions IA utilisent le même snapshot.
 
 ### Hébergement des fichiers Markdown
 
-La méthode est choisie avec `content.mode` dans `config/portfolio.json`.
+La méthode est choisie avec `content.mode` dans `config/portfolio.json`. Seule la section correspondant au mode actif est utilisée ; les autres peuvent rester avec leurs valeurs par défaut.
 
 #### 1. GitHub public
 
@@ -111,7 +111,7 @@ La méthode est choisie avec `content.mode` dans `config/portfolio.json`.
 }
 ```
 
-Le dépôt doit être public : aucune clé GitHub n'est envoyée au navigateur. Le SHA du dernier commit sert de version. Après un commit Markdown, rechargez la page ; aucun rebuild Docker n'est nécessaire.
+Le dépôt doit être public : aucune clé GitHub n'est envoyée au navigateur. Modifiez `content/<langue>/<commande>.md`, committez et poussez sur la branche indiquée par `ref`, puis rechargez la page. Le navigateur vérifie le SHA de cette branche et, s'il a changé, relit directement les 27 fichiers Markdown FR/EN/ES. Le serveur Docker n'a pas besoin de faire `git pull` et `deploy.sh` n'est pas nécessaire.
 
 #### 2. HTTP, HTTPS, S3 ou CDN
 
@@ -139,7 +139,14 @@ Le stockage doit servir les fichiers publiquement avec CORS autorisé. `versionU
 }
 ```
 
-Le Compose monte déjà `./data/content` vers `/usr/share/nginx/html/data/content:ro`. Modifiez par exemple `data/content/fr/about.md`, puis rechargez la page. Aucun accès GitHub, rebuild, `deploy.sh` ou redémarrage du container n'est nécessaire.
+Le Compose monte déjà `./content` vers `/usr/share/nginx/html/data/content:ro`. Modifiez par exemple `content/fr/about.md`, puis rechargez la page. Aucun accès GitHub, rebuild, `deploy.sh` ou redémarrage du container n'est nécessaire.
+
+Test rapide depuis le serveur :
+
+```bash
+sed -n '1,40p' content/fr/about.md
+curl -fsS http://localhost:${PORT:-3012}/data/content/fr/about.md | sed -n '1,40p'
+```
 
 Structure attendue pour chaque méthode :
 
@@ -225,9 +232,9 @@ Les chaînes UI (3 langues) sont dans [`src/src/i18n.ts`](src/src/i18n.ts).
 
 Pour remplacer le CV : déposez votre PDF dans `src/public/cv/` sous le nom `resume.pdf` et mettez à jour `cvUrl` dans `profile.ts`.
 
-En mode local, mettez `content.mode` à `local`, utilisez `/data/content` dans `config/portfolio.json` et placez les fichiers dans `data/content/<locale>/`. Le dépôt GitHub doit être public, car aucun token GitHub n'est utilisé.
+En mode local, mettez `content.mode` à `local`, utilisez `/data/content` dans `config/portfolio.json` et modifiez les fichiers dans `content/<locale>/`. Le dépôt GitHub doit être public, car aucun token GitHub n'est utilisé.
 
-Pour tester une modification locale, éditez `data/content/fr/about.md`, rechargez la page et lancez `about`. Aucun rebuild, redémarrage Compose ou `deploy.sh` n'est nécessaire. En mode GitHub, committez le Markdown sur la branche publique configurée puis rechargez la page ; aucun redéploiement n'est nécessaire. Un rebuild est nécessaire uniquement pour modifier l'application elle-même ou utiliser du contenu embarqué.
+Pour tester une modification locale, éditez `content/fr/about.md`, rechargez la page et lancez `about`. Aucun rebuild, redémarrage Compose ou `deploy.sh` n'est nécessaire. En mode GitHub, committez le Markdown sur la branche publique configurée puis rechargez la page ; aucun redéploiement n'est nécessaire. Un rebuild est nécessaire uniquement pour modifier l'application elle-même ou utiliser du contenu embarqué.
 
 ## 🔄 Reverse proxy (nginx / NPM)
 

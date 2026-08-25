@@ -14,7 +14,7 @@ import { uiText } from "../../i18n";
 const Lab: React.FC = () => {
   const { locale } = useContext(languageContext);
   const lab = getLabProfile(locale);
-  const markdownSections = locale === "fr" ? getMarkdownSections(locale, "lab") : [];
+  const markdownSections = getMarkdownSections(locale, "lab");
   const copy = uiText[locale];
 
   return (

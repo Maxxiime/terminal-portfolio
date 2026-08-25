@@ -1,12 +1,22 @@
 import { ContactBrandIcon } from "../styles/Education.styled";
 import { DetailDesc, DetailList, DetailTitle, HelpWrapper } from "../styles/Help.styled";
 import { getCertificationItems } from "../../data/profile";
+import { getMarkdownSections } from "../../data/markdown";
 import { useContext } from "react";
 import { languageContext } from "../../App";
 
 const Certification: React.FC = () => {
   const { locale } = useContext(languageContext);
-  const certificationItems = getCertificationItems(locale);
+  const fallbackItems = getCertificationItems(locale);
+  const markdownItems = getMarkdownSections(locale, "certification")
+    .filter(section => section.level === 2 && section.title)
+    .map((section, index) => ({
+      title: section.title,
+      issuer: section.paragraphs[0] || "",
+      issued: section.paragraphs[1] || "",
+      iconUrl: fallbackItems[index]?.iconUrl || "/brands/terminal-prompt.svg",
+    }));
+  const certificationItems = markdownItems.length ? markdownItems : fallbackItems;
 
   return (
     <HelpWrapper data-testid="certification">

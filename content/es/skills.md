@@ -1,5 +1,3 @@
-# Habilidades
-
 ## Core
 
 - DevOps

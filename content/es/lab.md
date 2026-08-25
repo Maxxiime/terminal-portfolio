@@ -1,10 +1,10 @@
 # Self-Hosted Infrastructure, Automation & AI Lab
 
-2014 - Présent
+2014 – Presente
 
-Construit et enrichi en continu depuis 2014, ce lab personnel est centré sur l'infrastructure self-hosted, l'automatisation, les workflows assistés par l'IA et les intégrations smart home avancées. Au fil du temps, il est devenu un environnement réel utilisé pour expérimenter la virtualisation, les conteneurs, le stockage, le monitoring, les sauvegardes, l'identité, le réseau, les outils LLM locaux, les workflows à base d'agents et des intégrations sur mesure. Il comprend aussi de petites applications utilitaires et des pipelines d'automatisation pensés pour répondre à des besoins concrets, avec un fort accent sur la fiabilité, l'autonomie et la maintenabilité long terme.
+Construido y evolucionado de forma continua desde 2014, este lab personal está centrado en infraestructura self-hosted, automatización, flujos asistidos por IA e integraciones avanzadas de smart home. Con el tiempo, se ha convertido en un entorno real usado para experimentar con virtualización, contenedores, almacenamiento, monitoreo, backup, identidad, redes, herramientas LLM locales, flujos basados en agentes e integraciones personalizadas. También incluye pequeñas aplicaciones utilitarias y pipelines de automatización diseñados para resolver necesidades prácticas, con un fuerte foco en la fiabilidad, la autonomía y el mantenimiento a largo plazo.
 
-## Infrastructure
+## Infraestructura
 
 - Proxmox Server — 64GB RAM / Xeon 16 Cores
 - Synology NAS — RAID5 16TB

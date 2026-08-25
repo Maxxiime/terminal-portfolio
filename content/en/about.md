@@ -1,7 +1,3 @@
-# Maxime Lemenand
-
-DevOps / SRE | Automation, Self-Hosting, AI-Driven Operations
-
 I work on infrastructure, automation and reliable systems, with a strong hands-on DevOps mindset.
 
 My background spans systems, cloud, networking, virtualization, containers, observability and infrastructure automation.

@@ -2,6 +2,7 @@ import { useContext } from "react";
 import { languageContext } from "../../App";
 import { uiText, type Locale } from "../../i18n";
 import { getExperiences } from "../../data/profile";
+import { getMarkdownSections } from "../../data/markdown";
 import { termContext } from "../Terminal";
 import { UsageDiv } from "../styles/Output.styled";
 import {
@@ -47,7 +48,22 @@ const Experience: React.FC = () => {
   const { locale } = useContext(languageContext);
   const { arg } = useContext(termContext);
   const copy = uiText[locale];
-  const experiences = getExperiences(locale);
+  const fallbackExperiences = getExperiences(locale);
+  const markdownExperiences = getMarkdownSections(locale, "experience")
+    .filter(section => section.level === 2 && section.title)
+    .map(section => {
+      const titleSeparator = section.title.indexOf(" — ");
+      const metadata = section.paragraphs[0] || "";
+      const metadataSeparator = metadata.indexOf(" · ");
+      return {
+        company: titleSeparator >= 0 ? section.title.slice(0, titleSeparator) : section.title,
+        role: titleSeparator >= 0 ? section.title.slice(titleSeparator + 3) : "",
+        period: metadataSeparator >= 0 ? metadata.slice(0, metadataSeparator) : metadata,
+        location: metadataSeparator >= 0 ? metadata.slice(metadataSeparator + 3) : "",
+        bullets: section.items,
+      };
+    });
+  const experiences = markdownExperiences.length >= 4 ? markdownExperiences : fallbackExperiences;
   const choices = experienceChoiceMap[locale];
   const selectedId = arg[0];
 

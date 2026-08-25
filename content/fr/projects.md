@@ -1,17 +1,11 @@
-# Réalisations
+## Lab IA, automatisation et infrastructure self-hosted
 
-## Password Manager
+Plateforme self-hosted de long terme utilisée pour expérimenter virtualisation, conteneurs, stockage, réseau, monitoring, sauvegarde, identité, domotique et outils IA locaux dans des scénarios concrets.
 
-Migration et déploiement d’un gestionnaire de secrets avec SSO, import, sauvegarde externalisée, rétention et monitoring opérationnel.
+## Domotique avancée et workflows assistés par l'IA
 
-## SMTP Relay Server
+Travail pratique hors production mêlant domotique, self-hosting et workflows opérationnels assistés par l'IA pour prototyper des systèmes et automatisations utiles.
 
-Relais SMTP Microsoft 365 automatisé avec Postfix, authentification OAuth2, chiffrement TLS, filtrage et observabilité.
+## Utilitaires d'exploitation et expérimentations observabilité
 
-## Logs Analyzer
-
-Centralisation et analyse de logs systèmes et réseau avec une stack de collecte, d’indexation et de visualisation.
-
-## Backup d’équipements réseau
-
-Script shell de sauvegarde automatique des configurations d’équipements réseau avec rapports et suivi opérationnel.
+Inclut notamment analyse de logs avec ELK, scripts de sauvegarde pour équipements réseau, stacks de monitoring et outils opérationnels construits pour répondre à des besoins infra concrets.

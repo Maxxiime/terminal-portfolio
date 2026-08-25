@@ -1,5 +1,3 @@
-# Skills
-
 ## Core
 
 - DevOps

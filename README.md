@@ -104,16 +104,48 @@ Docker mounts this file at runtime, so it can be changed without rebuilding the 
 ```yaml
 volumes:
   - ./config:/usr/share/nginx/html/config:ro
-  - ./data/content:/usr/share/nginx/html/data/content:ro
+  - ./content:/usr/share/nginx/html/data/content:ro
 ```
 
 Edit the Markdown files in `content/fr/`, `content/en/`, and `content/es/` to update the command output. The browser checks the configured source version at startup and only downloads the files again when it changes. The `question` command uses the same Markdown content.
 
 ### Markdown hosting methods
 
-- **Public GitHub** — set `content.mode` to `github` and configure `owner`, `repo`, `ref`, and `path`. No token is sent, so the repository must be public. The commit SHA is used for version checks.
-- **HTTP/HTTPS, S3 or CDN** — set `content.mode` to `http`, configure `baseUrl`, and optionally `versionUrl`. The origin must allow browser CORS. The version endpoint may return text or JSON with `sha` or `version`.
-- **Local Docker volume** — set `content.mode` to `local` with `baseUrl: "/data/content"`. Compose already mounts `./data/content` read-only. Edit a file and reload the page; no rebuild or container restart is required.
+Choose one method with `content.mode`. Settings for inactive modes are ignored.
+
+#### 1. Public GitHub
+
+```json
+"content": {
+  "mode": "github",
+  "github": {
+    "owner": "Maxxiime",
+    "repo": "terminal-portfolio",
+    "ref": "main",
+    "path": "content"
+  }
+}
+```
+
+The repository must be public because no GitHub token is sent. Edit `content/<locale>/<topic>.md`, commit and push to the branch configured in `ref`, then reload the page. The browser checks that branch's commit SHA and fetches all FR/EN/ES files when it changes. The Docker server does not need `git pull` or `deploy.sh`.
+
+#### 2. Local Docker volume
+
+```json
+"content": {
+  "mode": "local",
+  "local": {
+    "baseUrl": "/data/content",
+    "versionUrl": ""
+  }
+}
+```
+
+Compose mounts `./content` at `/usr/share/nginx/html/data/content:ro`. Edit `content/<locale>/<topic>.md` directly on the server and reload the page. No rebuild, `deploy.sh`, or container restart is required.
+
+#### Optional: HTTP/HTTPS, S3 or CDN
+
+Set `content.mode` to `http`, configure `http.baseUrl`, and optionally `http.versionUrl`. The origin must allow browser CORS. The version endpoint may return text or JSON with `sha` or `version`.
 
 All FR/EN/ES files are loaded when the main page opens. Missing EN/ES files fall back to FR, and bundled Markdown remains the final fallback when an external source is unavailable.
 
@@ -179,7 +211,7 @@ Key fields at the top of `profile.ts`:
 
 To replace the CV: drop your PDF in `src/public/cv/` as `resume.pdf` and update `cvUrl` in `profile.ts`.
 
-For local Markdown mode, set `content.mode` to `local` and use `/data/content` in `config/portfolio.json`, then place files under `data/content/<locale>/`. GitHub mode must use a public repository because the browser does not send a GitHub token.
+For local Markdown mode, set `content.mode` to `local`, use `/data/content` in `config/portfolio.json`, and edit files under `content/<locale>/`. GitHub mode must use a public repository because the browser does not send a GitHub token.
 
 If you edit a mounted local Markdown file, reload the browser; no image rebuild, Compose restart or `deploy.sh` is needed. For GitHub mode, commit the Markdown change to the configured public branch and reload the browser; deployment is not needed. Rebuild only when changing the application itself or using bundled content.
 

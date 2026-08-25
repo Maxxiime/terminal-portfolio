@@ -1,7 +1,5 @@
-# IA & automatisation
+# IA
 
-Maxime utilise des agents IA et des LLM locaux pour la recherche infrastructure, la configuration, les revues, les migrations et les workflows opérationnels.
-
-Son environnement comprend notamment Hermes, Ollama, Open WebUI, OmniRoute et des intégrations personnalisées avec Home Assistant, n8n et son homelab.
-
-L’objectif est d’utiliser l’IA comme couche d’automatisation et d’exploitation au-dessus d’une infrastructure maîtrisée, plutôt que comme remplacement de l’expertise infrastructure.
+- Utilise des agents IA et des outils LLM locaux pour la recherche infrastructure, la configuration, les revues et les tâches liées aux migrations.
+- S'intéresse aux workflows à base d'agents qui améliorent les opérations sans s'éloigner du coeur infrastructure.
+- Approche pragmatique : réduire le travail répétitif, accélérer l'exécution et aider la prise de décision dans les environnements opérationnels.

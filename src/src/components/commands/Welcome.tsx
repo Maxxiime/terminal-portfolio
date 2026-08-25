@@ -25,7 +25,7 @@ const Welcome: React.FC = () => {
   const { locale } = useContext(languageContext);
   const copy = uiText[locale];
   const config = getPortfolioConfig();
-  const markdownSections = locale === "fr" ? getMarkdownSections(locale, "welcome") : [];
+  const markdownSections = getMarkdownSections(locale, "welcome");
   const markdownProfile = markdownSections.find(section => section.title === profile.name || section.title === config.person.name);
   const welcomeHeadline = markdownSections[0]?.title || copy.welcomeHeadline;
   const markdownTagline = markdownProfile?.paragraphs[0] || profile.title;

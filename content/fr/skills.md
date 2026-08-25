@@ -1,5 +1,3 @@
-# Compétences
-
 ## Core
 
 - DevOps

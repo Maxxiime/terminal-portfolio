@@ -51,6 +51,20 @@ server {
     try_files $uri =404;
   }
 
+  # Runtime Markdown must never fall through to the SPA entry point. A missing
+  # document is a real 404; otherwise index.html would be parsed as portfolio
+  # content by the client.
+  location ^~ /data/content/ {
+    default_type text/markdown;
+    add_header Cache-Control "no-store, no-cache, must-revalidate";
+    try_files $uri =404;
+  }
+
+  location ^~ /config/ {
+    add_header Cache-Control "no-store, no-cache, must-revalidate";
+    try_files $uri =404;
+  }
+
   location = /manifest.webmanifest {
     return 301 /site.webmanifest;
   }
