@@ -81,7 +81,7 @@ The portfolio is available at `http://localhost:3012` (or your configured PORT).
 
 The easiest file to edit for a new portfolio is [`config/portfolio.json`](config/portfolio.json). It contains the name, terminal hostname, assistant labels, SEO text, suggested questions, AI model, and Markdown source.
 
-The mounted JSON file is the primary portfolio configuration. Environment variables are optional deployment overrides: an empty variable does not erase a value from `config/portfolio.json`. You do not need to fill the HTTP and local content variables when using GitHub mode; only the selected source is read.
+The mounted JSON file is the primary portfolio configuration. Environment variables are optional deployment overrides: an empty variable does not erase a value from `config/portfolio.json`. This includes `AI_PROVIDER_MODEL`, which falls back to `ai.model` in the JSON. You do not need to fill the HTTP and local content variables when using GitHub mode; only the selected source is read.
 
 Docker mounts this file at runtime, so it can be changed without rebuilding the image:
 

@@ -8,7 +8,7 @@ services:
     environment:
       - AI_PROVIDER_URL=${AI_PROVIDER_URL:-https://openrouter.ai/api/v1/chat/completions}
       - AI_PROVIDER_API_KEY=${AI_PROVIDER_API_KEY:-}
-      - AI_PROVIDER_MODEL=${AI_PROVIDER_MODEL:-openrouter/free}
+      - AI_PROVIDER_MODEL=${AI_PROVIDER_MODEL:-}
       - AI_PROVIDER_TYPE=${AI_PROVIDER_TYPE:-openai-compatible}
       - PORTFOLIO_NAME=${PORTFOLIO_NAME:-}
       - PORTFOLIO_FIRST_NAME=${PORTFOLIO_FIRST_NAME:-}
