@@ -6,7 +6,7 @@ import Terminal from "./components/Terminal";
 import { getFromLS, setToLS } from "./utils/storage";
 import { Locale, resolveLocale, supportedLocales } from "./i18n";
 import { loadMarkdownContent } from "./data/markdown";
-import { loadPortfolioConfig } from "./data/portfolio-config";
+import { initializeAnalytics, loadPortfolioConfig } from "./data/portfolio-config";
 
 export const languageContext = createContext<{
   locale: Locale;
@@ -45,7 +45,10 @@ function App() {
   const [locale, setSelectedLocale] = useState<Locale>(getInitialLocale);
 
   useEffect(() => {
-    void Promise.all([loadPortfolioConfig(), loadMarkdownContent()]).then(() => setMarkdownVersion(version => version + 1));
+    void Promise.all([loadPortfolioConfig(), loadMarkdownContent()]).then(() => {
+      initializeAnalytics();
+      setMarkdownVersion(version => version + 1);
+    });
   }, []);
 
   useEffect(() => {

@@ -36,7 +36,7 @@ Un portfolio interactif en style terminal avec Q&R alimentée par IA, support mu
 | Couche | Technologie |
 |--------|-------------|
 | Frontend | React 18, TypeScript, Vite, styled-components |
-| Runtime | nginx:alpine (routage SPA + proxy OpenRouter) |
+| Runtime | nginx:alpine (routage SPA + proxy du provider configuré) |
 | Déploiement | Docker + Docker Compose |
 
 ## 📁 Structure
@@ -52,7 +52,7 @@ Un portfolio interactif en style terminal avec Q&R alimentée par IA, support mu
 │       └── brands/           ← icônes de marques/certifications
 ├── runtime/          # Contexte de build Docker
 │   ├── Dockerfile
-│   ├── nginx.conf.template   ← routage SPA + proxy OpenRouter
+│   ├── nginx.conf.template   ← routage SPA + proxy du provider
 │   ├── health.sh             ← génère l'endpoint /health au démarrage
 │   └── dist/                 ← peuplé par deploy.sh (gitignored)
 ├── docker-compose.yml
@@ -69,7 +69,7 @@ cd terminal-portfolio
 
 # 2. Configurer l'environnement
 cp .env.example .env
-# éditer .env — choisir le provider IA et la source des contenus
+# modifier config/portfolio.json et .env
 
 # 3. Déployer
 ./deploy.sh
@@ -77,9 +77,11 @@ cp .env.example .env
 
 Le portfolio est disponible sur `http://localhost:3012` (ou le PORT configuré).
 
+> Ce dépôt construit le CLI terminal autonome. Le site split-screen assistant + CLI est une application Sites séparée qui embarque ce CLI au build ; lancer `deploy.sh` dans ce dépôt affiche donc uniquement le CLI.
+
 ## 🔧 Configuration
 
-Le fichier le plus simple à modifier pour créer un nouveau portfolio est [`config/portfolio.json`](config/portfolio.json). Il contient le nom, le hostname du terminal, les textes de l'assistant, les métadonnées SEO, les questions suggérées, le modèle IA et la source Markdown.
+Le fichier unique à modifier pour les réglages non secrets est [`config/portfolio.json`](config/portfolio.json). Il contient le nom, le hostname du terminal, les textes de l'assistant, les métadonnées SEO, les questions, le provider IA, Umami et la source Markdown.
 
 Docker monte ce fichier au démarrage :
 
@@ -89,33 +91,16 @@ volumes:
   - ./data/content:/usr/share/nginx/html/data/content:ro
 ```
 
-Modifiez les fichiers Markdown dans `content/fr/`, `content/en/` et `content/es/` pour mettre à jour les commandes `about`, `skills`, `lab`, `experience`, `projects`, `education`, `certification`, `ai` et `welcome`. Le navigateur vérifie la version configurée au démarrage et ne retélécharge les fichiers qu'en cas de changement. La commande `question` utilise les mêmes Markdown.
+Modifiez les fichiers Markdown dans `content/fr/`, `content/en/` et `content/es/` pour mettre à jour les commandes. Le navigateur vérifie la version configurée au démarrage et ne retélécharge les fichiers qu'en cas de changement. La commande `question` utilise les mêmes Markdown.
 
 ### Variables d'environnement
 
 | Variable | Description | Requis |
 |---|---|---|
-| `AI_PROVIDER_URL` | URL OpenAI-compatible des chat completions | Oui, sauf proxy legacy |
-| `AI_PROVIDER_API_KEY` | Clé API conservée côté nginx | Selon le provider |
-| `AI_PROVIDER_MODEL` | Nom du modèle | Oui |
-| `AI_PROVIDER_TYPE` | Libellé du provider, actuellement `openai-compatible` | Non |
+| `AI_PROVIDER_API_KEY` | Clé du provider, conservée côté nginx | Selon le provider |
 | `PORT` | Port hôte, défaut `3012` | Non |
-| `PORTFOLIO_NAME` | Surcharge du nom affiché | Non |
-| `PORTFOLIO_FIRST_NAME` | Surcharge du prénom | Non |
-| `PORTFOLIO_TERMINAL_HOST` | Hostname affiché dans le prompt | Non |
-| `CONTENT_MODE` | `github`, `http` ou `local` | Non |
-| `CONTENT_GITHUB_OWNER` | Username/organisation GitHub | Mode GitHub |
-| `CONTENT_GITHUB_REPO` | Nom du dépôt GitHub | Mode GitHub |
-| `CONTENT_GITHUB_REF` | Branche ou tag, généralement `main` | Mode GitHub |
-| `CONTENT_GITHUB_PATH` | Dossier Markdown, généralement `content` | Mode GitHub |
-| `CONTENT_HTTP_BASE_URL` | URL HTTP/S3-compatible | Mode HTTP |
-| `CONTENT_HTTP_VERSION_URL` | URL optionnelle de version/checksum | Non |
-| `CONTENT_LOCAL_BASE_URL` | Chemin monté, généralement `/data/content` | Mode local |
-| `CONTENT_LOCAL_VERSION_URL` | Fichier de version optionnel | Non |
-| `VITE_UMAMI_URL` | URL Umami optionnelle, au build | Non |
-| `VITE_UMAMI_WEBSITE_ID` | Website ID Umami public | Non |
 
-Les exemples OpenRouter, OpenAI et Ollama sont dans [`.env.example`](.env.example). Ne placez jamais `AI_PROVIDER_API_KEY` dans le frontend.
+Les paramètres `providerType`, `providerUrl` et `model` sont dans `config/portfolio.json`. Exemples OpenRouter, OpenAI et Ollama dans [`.env.example`](.env.example). Ne placez jamais `AI_PROVIDER_API_KEY` dans le frontend.
 
 Obtenez une clé gratuite sur [openrouter.ai/keys](https://openrouter.ai/keys).
 
@@ -151,7 +136,7 @@ docker compose up -d --build
 | `/`               | SPA du portfolio terminal |
 | `/health`         | JSON de vérification de santé |
 | `/cv/resume.pdf`  | PDF du CV                |
-| `/api/question`   | Proxy OpenRouter (POST)  |
+| `/api/question`   | Proxy du provider configuré (POST)  |
 
 ## ✏️ Personnaliser le portfolio
 
@@ -159,7 +144,7 @@ Utilisez ces fichiers :
 
 | Fichier | Rôle |
 |---|---|
-| [`config/portfolio.json`](config/portfolio.json) | Nom, assistant, SEO, questions, source Markdown et modèle |
+| [`config/portfolio.json`](config/portfolio.json) | Nom, assistant, SEO, questions, provider, analytics et source Markdown |
 | [`content/fr/`](content/fr/) | Contenu français et connaissances IA |
 | [`content/en/`](content/en/) | Contenu anglais et connaissances IA |
 | [`content/es/`](content/es/) | Contenu espagnol et connaissances IA |
@@ -173,18 +158,19 @@ Champs clés en haut de `profile.ts` :
 | `firstName` | Utilisé dans les questions d'exemple IA (`question quelles sont les compétences de Jean ?`) |
 | `name` | Nom complet affiché dans le terminal |
 | `email`, `linkedinUrl`, `githubUrl` | Liens de contact |
-| `terminalHost` | Domaine affiché dans le prompt du terminal |
+| `terminalHost` | Domaine affiché dans le prompt ; configuré dans `portfolio.json` |
 | `cvUrl` | URL du PDF du CV servi par le container |
 
 Les chaînes UI (3 langues) sont dans [`src/src/i18n.ts`](src/src/i18n.ts).
 
 Pour remplacer le CV : déposez votre PDF dans `src/public/cv/` sous le nom `resume.pdf` et mettez à jour `cvUrl` dans `profile.ts`.
 
-En mode local, définissez `CONTENT_MODE=local`, `CONTENT_LOCAL_BASE_URL=/data/content` et placez les fichiers dans `data/content/<locale>/`. Pour GitHub, HTTPS ou S3-compatible, utilisez le mode correspondant dans `config/portfolio.json` ou `.env`.
+En mode local, mettez `content.mode` à `local`, utilisez `/data/content` dans `config/portfolio.json` et placez les fichiers dans `data/content/<locale>/`. Le dépôt GitHub doit être public, car aucun token GitHub n'est utilisé.
+
+Pour tester une modification locale, éditez `data/content/fr/about.md`, rechargez la page et lancez `about`. Aucun rebuild, redémarrage Compose ou `deploy.sh` n'est nécessaire. En mode GitHub, committez le Markdown sur la branche publique configurée puis rechargez la page ; aucun redéploiement n'est nécessaire. Un rebuild est nécessaire uniquement pour modifier l'application elle-même ou utiliser du contenu embarqué.
 
 ## 🔄 Reverse proxy (nginx / NPM)
 
 Si vous utilisez un reverse proxy, assurez-vous qu'il transfère les requêtes telles quelles — la configuration nginx dans le container gère directement le routage SPA et les fichiers statiques.
 
-Le service worker (PWA) exclut automatiquement `/health` et `/cv/` du fallback SPA.
-La configuration principale du portfolio est [`config/portfolio.json`](config/portfolio.json). Les variables d’environnement sont des overrides optionnels pour le déploiement. Une variable vide n’écrase pas la valeur du fichier JSON, y compris pour `AI_PROVIDER_MODEL` qui utilise alors `ai.model`. Si `CONTENT_MODE=github`, il n’est pas nécessaire de renseigner les variables HTTP ou local : elles ne sont pas utilisées.
+Le service worker (PWA) exclut automatiquement `/health` et `/cv/` du fallback SPA. Les réglages non secrets ne sont pas dupliqués dans `.env`.

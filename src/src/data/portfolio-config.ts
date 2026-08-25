@@ -5,7 +5,8 @@ export type PortfolioRuntimeConfig = {
   person: { name: string; firstName: string; terminalHost: string };
   assistant: { displayName: string; uri: string; title: string; subtitle: string; disclaimer: string };
   portfolioLabel: string;
-  ai: { model: string };
+  ai: { providerType: string; providerUrl: string; model: string };
+  analytics: { umamiUrl: string; websiteId: string };
   seo: { title: string; description: string; image: string };
   suggestions: Record<Locale, string[]>;
   content: {
@@ -26,7 +27,12 @@ export const defaultPortfolioConfig: PortfolioRuntimeConfig = {
     disclaimer: "Markdown portfolio · réponses générées par IA",
   },
   portfolioLabel: "portfolio.cli — embedded",
-  ai: { model: "openrouter/free" },
+  ai: {
+    providerType: "openai-compatible",
+    providerUrl: "https://openrouter.ai/api/v1/chat/completions",
+    model: "openrouter/free",
+  },
+  analytics: { umamiUrl: "", websiteId: "" },
   seo: {
     title: "Maxime Lemenand | Terminal Portfolio",
     description: "Infrastructure / DevOps terminal portfolio focused on automation, self-hosting and AI-assisted operations.",
@@ -60,7 +66,14 @@ const mergeConfig = (
   },
   assistant: { ...base.assistant, ...input.assistant },
   portfolioLabel: input.portfolioLabel || base.portfolioLabel,
-  ai: { ...base.ai, ...input.ai, model: input.ai?.model || base.ai.model },
+  ai: {
+    ...base.ai,
+    ...input.ai,
+    providerType: input.ai?.providerType || base.ai.providerType,
+    providerUrl: input.ai?.providerUrl || base.ai.providerUrl,
+    model: input.ai?.model || base.ai.model,
+  },
+  analytics: { ...base.analytics, ...input.analytics },
   seo: { ...base.seo, ...input.seo },
   suggestions: { ...base.suggestions, ...input.suggestions },
   content: {
@@ -85,15 +98,22 @@ export async function loadPortfolioConfig() {
   try {
     const response = await fetch("/config/portfolio.json", { cache: "no-store" });
     if (response.ok) runtimeConfig = mergeConfig(await response.json() as Partial<PortfolioRuntimeConfig>);
-    const runtimeResponse = await fetch("/runtime-config.json", { cache: "no-store" });
-    if (runtimeResponse.ok) {
-      runtimeConfig = mergeConfig(
-        await runtimeResponse.json() as Partial<PortfolioRuntimeConfig>,
-        runtimeConfig,
-      );
-    }
   } catch {
     // Bundled defaults remain usable when the optional runtime file is unavailable.
   }
   return runtimeConfig;
+}
+
+export function initializeAnalytics() {
+  if (typeof document === "undefined") return;
+  const { umamiUrl, websiteId } = runtimeConfig.analytics;
+  if (!umamiUrl || !websiteId || document.querySelector("script[data-website-id]")) return;
+
+  const script = document.createElement("script");
+  script.defer = true;
+  script.src = umamiUrl.endsWith("/script.js")
+    ? umamiUrl
+    : `${umamiUrl.replace(/\/$/, "")}/script.js`;
+  script.dataset.websiteId = websiteId;
+  document.head.appendChild(script);
 }

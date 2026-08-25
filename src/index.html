@@ -47,22 +47,6 @@
     <meta name="msapplication-TileColor" content="#1d2a35" />
     <meta name="theme-color" content="#1d2a35" />
 
-    <!-- Optional Umami analytics. Vite replaces these values when configured. -->
-    <script>
-      (() => {
-        const url = "%VITE_UMAMI_URL%";
-        const websiteId = "%VITE_UMAMI_WEBSITE_ID%";
-        if (!url || !websiteId || url.includes("%VITE_") || websiteId.includes("%VITE_")) return;
-        const script = document.createElement("script");
-        script.defer = true;
-        script.src = url.endsWith("/script.js")
-          ? url
-          : `${url.replace(/\/$/, "")}/script.js`;
-        script.dataset.websiteId = websiteId;
-        document.head.appendChild(script);
-      })();
-    </script>
-
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

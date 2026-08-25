@@ -36,7 +36,15 @@
       "Háblame de su laboratorio de IA y self-hosting"
     ]
   },
-  "ai": { "model": "openrouter/free" },
+  "ai": {
+    "providerType": "openai-compatible",
+    "providerUrl": "https://openrouter.ai/api/v1/chat/completions",
+    "model": "openrouter/free"
+  },
+  "analytics": {
+    "umamiUrl": "",
+    "websiteId": ""
+  },
   "content": {
     "mode": "github",
     "github": { "owner": "Maxxiime", "repo": "terminal-portfolio", "ref": "main", "path": "content" },

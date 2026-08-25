@@ -36,7 +36,7 @@ Un portfolio interactivo estilo terminal con preguntas y respuestas impulsadas p
 | Capa | Tecnología |
 |------|-----------|
 | Frontend | React 18, TypeScript, Vite, styled-components |
-| Runtime | nginx:alpine (enrutamiento SPA + proxy OpenRouter) |
+| Runtime | nginx:alpine (enrutamiento SPA + proxy del provider configurado) |
 | Despliegue | Docker + Docker Compose |
 
 ## 📁 Estructura
@@ -52,7 +52,7 @@ Un portfolio interactivo estilo terminal con preguntas y respuestas impulsadas p
 │       └── brands/           ← iconos de marcas/certificaciones
 ├── runtime/          # Contexto de build Docker
 │   ├── Dockerfile
-│   ├── nginx.conf.template   ← enrutamiento SPA + proxy OpenRouter
+│   ├── nginx.conf.template   ← enrutamiento SPA + proxy del provider
 │   ├── health.sh             ← genera el endpoint /health al inicio
 │   └── dist/                 ← llenado por deploy.sh (gitignored)
 ├── docker-compose.yml
@@ -69,7 +69,7 @@ cd terminal-portfolio
 
 # 2. Configurar el entorno
 cp .env.example .env
-# editar .env — elegir el proveedor IA y la fuente de contenido
+# editar config/portfolio.json y .env
 
 # 3. Desplegar
 ./deploy.sh
@@ -77,9 +77,11 @@ cp .env.example .env
 
 El portfolio está disponible en `http://localhost:3012` (o el PORT configurado).
 
+> Este repositorio construye el CLI terminal independiente. El sitio split-screen assistant + CLI es una aplicación Sites separada que incluye este CLI durante el build; ejecutar `deploy.sh` en este repositorio muestra únicamente el CLI.
+
 ## 🔧 Configuración
 
-El archivo más sencillo para adaptar el portfolio es [`config/portfolio.json`](config/portfolio.json). Contiene el nombre, hostname del terminal, textos del asistente, metadatos SEO, preguntas sugeridas, modelo IA y fuente Markdown.
+El archivo único para toda la configuración no secreta es [`config/portfolio.json`](config/portfolio.json). Contiene el nombre, hostname del terminal, textos del asistente, metadatos SEO, preguntas, provider IA, Umami y fuente Markdown.
 
 Docker monta este archivo al iniciar:
 
@@ -89,33 +91,16 @@ volumes:
   - ./data/content:/usr/share/nginx/html/data/content:ro
 ```
 
-Edita los Markdown de `content/fr/`, `content/en/` y `content/es/` para actualizar los comandos `about`, `skills`, `lab`, `experience`, `projects`, `education`, `certification`, `ai` y `welcome`. El navegador comprueba la versión configurada al iniciar y solo vuelve a descargar los archivos cuando cambia. El comando `question` usa el mismo contenido Markdown.
+Edita los Markdown de `content/fr/`, `content/en/` y `content/es/` para actualizar los comandos. El navegador comprueba la versión configurada al iniciar y solo vuelve a descargar los archivos cuando cambia. El comando `question` usa el mismo contenido Markdown.
 
 ### Variables de entorno
 
 | Variable | Descripción | Requerido |
 |---|---|---|
-| `AI_PROVIDER_URL` | URL OpenAI-compatible de chat completions | Sí, salvo proxy legacy |
-| `AI_PROVIDER_API_KEY` | Clave conservada en nginx | Según el proveedor |
-| `AI_PROVIDER_MODEL` | Nombre del modelo | Sí |
-| `AI_PROVIDER_TYPE` | Etiqueta del proveedor, actualmente `openai-compatible` | No |
+| `AI_PROVIDER_API_KEY` | Clave del provider, conservada en nginx | Según el provider |
 | `PORT` | Puerto del host, por defecto `3012` | No |
-| `PORTFOLIO_NAME` | Nombre mostrado | No |
-| `PORTFOLIO_FIRST_NAME` | Nombre corto | No |
-| `PORTFOLIO_TERMINAL_HOST` | Hostname mostrado en el prompt | No |
-| `CONTENT_MODE` | `github`, `http` o `local` | No |
-| `CONTENT_GITHUB_OWNER` | Usuario/organización GitHub | Modo GitHub |
-| `CONTENT_GITHUB_REPO` | Nombre del repositorio | Modo GitHub |
-| `CONTENT_GITHUB_REF` | Rama o tag, normalmente `main` | Modo GitHub |
-| `CONTENT_GITHUB_PATH` | Carpeta Markdown, normalmente `content` | Modo GitHub |
-| `CONTENT_HTTP_BASE_URL` | URL HTTP/S3-compatible | Modo HTTP |
-| `CONTENT_HTTP_VERSION_URL` | URL opcional de versión/checksum | No |
-| `CONTENT_LOCAL_BASE_URL` | Ruta montada, normalmente `/data/content` | Modo local |
-| `CONTENT_LOCAL_VERSION_URL` | Archivo de versión opcional | No |
-| `VITE_UMAMI_URL` | URL Umami opcional, durante el build | No |
-| `VITE_UMAMI_WEBSITE_ID` | Website ID público de Umami | No |
 
-Los ejemplos de OpenRouter, OpenAI y Ollama están en [`.env.example`](.env.example). Nunca pongas `AI_PROVIDER_API_KEY` en el frontend.
+Los parámetros `providerType`, `providerUrl` y `model` están en `config/portfolio.json`. Los ejemplos OpenRouter, OpenAI y Ollama están en [`.env.example`](.env.example). Nunca pongas `AI_PROVIDER_API_KEY` en el frontend.
 
 Obtenga una clave gratuita en [openrouter.ai/keys](https://openrouter.ai/keys).
 
@@ -151,7 +136,7 @@ docker compose up -d --build
 | `/`               | SPA del portfolio terminal   |
 | `/health`         | JSON de verificación de salud |
 | `/cv/resume.pdf`  | PDF del CV                   |
-| `/api/question`   | Proxy OpenRouter (POST)      |
+| `/api/question`   | Proxy del provider configurado (POST)      |
 
 ## ✏️ Personalizar el portfolio
 
@@ -159,7 +144,7 @@ Utiliza estos archivos:
 
 | Archivo | Función |
 |---|---|
-| [`config/portfolio.json`](config/portfolio.json) | Nombre, asistente, SEO, preguntas, fuente Markdown y modelo |
+| [`config/portfolio.json`](config/portfolio.json) | Nombre, asistente, SEO, preguntas, provider, analytics y fuente Markdown |
 | [`content/fr/`](content/fr/) | Contenido francés y conocimiento IA |
 | [`content/en/`](content/en/) | Contenido inglés y conocimiento IA |
 | [`content/es/`](content/es/) | Contenido español y conocimiento IA |
@@ -173,18 +158,19 @@ Campos clave al inicio de `profile.ts`:
 | `firstName` | Usado en las preguntas de ejemplo IA (`question ¿cuáles son las habilidades de Juan?`) |
 | `name` | Nombre completo mostrado en el terminal |
 | `email`, `linkedinUrl`, `githubUrl` | Enlaces de contacto |
-| `terminalHost` | Dominio mostrado en el prompt del terminal |
+| `terminalHost` | Dominio mostrado en el prompt; configurado en `portfolio.json` |
 | `cvUrl` | URL del PDF del CV servido por el container |
 
 Las cadenas UI (3 idiomas) están en [`src/src/i18n.ts`](src/src/i18n.ts).
 
 Para reemplazar el CV: coloque su PDF en `src/public/cv/` con el nombre `resume.pdf` y actualice `cvUrl` en `profile.ts`.
 
-En modo local, define `CONTENT_MODE=local`, `CONTENT_LOCAL_BASE_URL=/data/content` y coloca los archivos en `data/content/<locale>/`. Para GitHub, HTTPS o S3-compatible, usa el modo correspondiente en `config/portfolio.json` o `.env`.
+En modo local, define `content.mode` como `local`, usa `/data/content` en `config/portfolio.json` y coloca los archivos en `data/content/<locale>/`. El repositorio GitHub debe ser público porque no se usa ningún token.
+
+Para probar un cambio local, edita `data/content/fr/about.md`, recarga la página y ejecuta `about`. No hace falta reconstruir la imagen, reiniciar Compose ni ejecutar `deploy.sh`. En modo GitHub, haz commit del Markdown en la rama pública configurada y recarga la página; no hace falta redeploy. Solo se necesita rebuild al modificar la aplicación o usar contenido incluido en la imagen.
 
 ## 🔄 Reverse proxy (nginx / NPM)
 
 Si utiliza un reverse proxy, asegúrese de que reenvíe las solicitudes tal cual — la configuración nginx dentro del container gestiona directamente el enrutamiento SPA y los archivos estáticos.
 
-El service worker (PWA) excluye automáticamente `/health` y `/cv/` del fallback SPA.
-La configuración principal del portfolio es [`config/portfolio.json`](config/portfolio.json). Las variables de entorno son overrides opcionales para el despliegue. Una variable vacía no sobrescribe el valor del archivo JSON, incluido `AI_PROVIDER_MODEL`, que utiliza `ai.model` en ese caso. Si `CONTENT_MODE=github`, no es necesario rellenar las variables HTTP o local: no se utilizan.
+El service worker (PWA) excluye automáticamente `/health` y `/cv/` del fallback SPA. La configuración no secreta no se duplica en `.env`.
