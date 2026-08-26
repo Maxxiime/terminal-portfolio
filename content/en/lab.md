@@ -6,9 +6,10 @@ Built and continuously evolved a personal lab since 2014, centered on self-hoste
 
 ## Infrastructure
 
-- Proxmox Server — 64GB RAM / Xeon 16 Cores
-- Synology NAS — RAID5 16TB
-- ESXi Server — 32GB RAM / Xeon 8 Cores / 6TB
+- Proxmox Server — 64GB RAM / Xeon 16 Cores / 512 Nvme & 2Tb SSD / Nvidia 3060 & 1660Ti
+- Synology — RAID5 16TB HDD
+- TrueNas — RAID1 4Tb HDD
+- ESXi Server — 32GB RAM / Xeon 8 Cores / 6TB HDD
 
 ## Virtualization & Containers
 
@@ -45,21 +46,21 @@ Built and continuously evolved a personal lab since 2014, centered on self-hoste
 - Home Assistant
 - ESPHome
 - MQTT
-- Matter
+- Matter Server
 - Zigbee2MQTT
 
 ## AI & Local LLM
 
 - Hermes
-- OpenClaw
-- Mercury
 - OmniRoute
 - Ollama
 - OpenWebUI
-- AgentMemory
+- Hindsight
+- MetaMCP
 
 ## Backup & Storage
 
+- Proxmox Backup Server
 - Synology
 - TrueNAS
 

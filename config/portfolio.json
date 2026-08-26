@@ -2,7 +2,7 @@
   "person": {
     "name": "Maxime Lemenand",
     "firstName": "Maxime",
-    "terminalHost": "portfolio.local"
+    "terminalHost": "maxime-lemenand.com"
   },
   "assistant": {
     "displayName": "Assistant de Maxime",
@@ -15,9 +15,9 @@
     "subtitle": "DevOps · SRE · Automatisation · Self-hosting · AI Ops",
     "disclaimer": "Markdown portfolio · réponses générées par IA"
   },
-  "portfolioLabel": "portfolio.cli — embedded",
+  "portfolioLabel": "Portfolio CLI",
   "seo": {
-    "title": "Maxime Lemenand | Terminal Portfolio",
+    "title": "Maxime Lemenand | Portfolio",
     "description": "Infrastructure / DevOps terminal portfolio focused on automation, self-hosting and AI-assisted operations.",
     "image": "/og-image.png"
   },

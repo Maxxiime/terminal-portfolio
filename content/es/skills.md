@@ -37,6 +37,7 @@
 - ELK
 - Grafana
 - Prometheus
+- Loki
 
 ## Network & Security
 

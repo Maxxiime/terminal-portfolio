@@ -1,4 +1,4 @@
-# Self-Hosted Infrastructure, Automation & AI Lab
+# Infrastructure auto-hébergée, automatisation & laboratoire d’IA
 
 2014 - Présent
 
@@ -6,30 +6,30 @@ Construit et enrichi en continu depuis 2014, ce lab personnel est centré sur l'
 
 ## Infrastructure
 
-- Proxmox Server — 64GB RAM / Xeon 16 Cores
-- Synology NAS — RAID5 16TB
-- ESXi Server — 32GB RAM / Xeon 8 Cores / 6TB
+- Proxmox Server — 64GB RAM / Xeon 16 Cores / 512 Nvme & 2Tb SSD / Nvidia 3060 & 1660Ti
+- Synology — RAID5 16TB HDD
+- TrueNas — RAID1 4Tb HDD
+- ESXi Server — 32GB RAM / Xeon 8 Cores / 6TB HDD
 
-## Virtualization & Containers
+## Virtualisation & conteneurs
 
 - Docker
 - k3s
 
-## Automation & Workflows
+## Automatisation & flux de travail
 
 - n8n
-- Node-RED
 - Planka
 - Git
 
-## Monitoring & Observability
+## Surveillance & observabilité
 
 - Frigate
 - Grafana
 - InfluxDB
 - Umami
 
-## Networking & Security
+## Réseau & sécurité
 
 - AdGuard
 - Authentik
@@ -40,34 +40,34 @@ Construit et enrichi en continu depuis 2014, ce lab personnel est centré sur l'
 - phpIPAM
 - Pentagi
 
-## Smart Home & IoT
+## Maison intelligente & IoT
 
 - Home Assistant
 - ESPHome
 - MQTT
-- Matter
+- Matter Server
 - Zigbee2MQTT
 
-## AI & Local LLM
+## IA & LLM locaux
 
 - Hermes
-- OpenClaw
-- Mercury
 - OmniRoute
 - Ollama
 - OpenWebUI
-- AgentMemory
+- Hindsight
+- MetaMCP
 
-## Backup & Storage
+## Sauvegarde & stockage
 
+- Proxmox Backup Server
 - Synology
 - TrueNAS
 
-## Remote Access & Management
+## Accès à distance & gestion
 
 - Guacamole
 
-## Documentation & Collaboration
+## Documentation & collaboration
 
 - Outline
 - Mail Server
