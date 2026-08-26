@@ -49,8 +49,8 @@
     "privateContextFile": "/run/portfolio-private/.IAinformation.md"
   },
   "analytics": {
-    "umamiUrl": "",
-    "websiteId": ""
+    "umamiUrl": "https://umami.maxime-lemenand.com",
+    "websiteId": "f6416d9c-120d-483e-91fe-9607ccd38249"
   },
   "content": {
     "mode": "github",
