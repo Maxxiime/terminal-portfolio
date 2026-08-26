@@ -36,7 +36,7 @@ Un portfolio interactivo estilo terminal con preguntas y respuestas impulsadas p
 | Capa | Tecnología |
 |------|-----------|
 | Frontend | React 18, TypeScript, Vite, styled-components |
-| Runtime | nginx:alpine (enrutamiento SPA + proxy OpenRouter) |
+| Runtime | nginx:alpine (enrutamiento SPA + proxy del provider configurado) |
 | Despliegue | Docker + Docker Compose |
 
 ## 📁 Estructura
@@ -45,14 +45,14 @@ Un portfolio interactivo estilo terminal con preguntas y respuestas impulsadas p
 ├── src/              # Fuente React/Vite
 │   ├── src/
 │   │   ├── components/
-│   │   ├── data/profile.ts   ← todo el contenido personal está aquí
+│   │   ├── data/profile.ts   ← fallback estructurado y metadatos del CLI
 │   │   └── i18n.ts           ← cadenas UI (fr/en/es)
 │   └── public/
 │       ├── cv/               ← coloque su PDF aquí
 │       └── brands/           ← iconos de marcas/certificaciones
 ├── runtime/          # Contexto de build Docker
 │   ├── Dockerfile
-│   ├── nginx.conf.template   ← enrutamiento SPA + proxy OpenRouter
+│   ├── nginx.conf.template   ← enrutamiento SPA + proxy del provider
 │   ├── health.sh             ← genera el endpoint /health al inicio
 │   └── dist/                 ← llenado por deploy.sh (gitignored)
 ├── docker-compose.yml
@@ -69,7 +69,7 @@ cd terminal-portfolio
 
 # 2. Configurar el entorno
 cp .env.example .env
-# editar .env — definir OPENROUTER_API_KEY y PORT
+# editar config/portfolio.json y .env
 
 # 3. Desplegar
 ./deploy.sh
@@ -77,12 +77,52 @@ cp .env.example .env
 
 El portfolio está disponible en `http://localhost:3012` (o el PORT configurado).
 
-## 🔑 Variables de entorno
+Una sola imagen Docker contiene ahora la interfaz split-screen completa: asistente IA a la izquierda, separador redimensionable y CLI local a la derecha. El CLI se sirve desde `/portfolio-cli/` sin depender de otro dominio.
 
-| Variable             | Descripción                                     | Requerido |
-|----------------------|-------------------------------------------------|-----------|
-| `OPENROUTER_API_KEY` | Clave API de OpenRouter (el tier gratuito funciona) | Sí   |
-| `PORT`               | Puerto del host (por defecto: `3012`)           | No        |
+## 🔧 Configuración
+
+El archivo único para toda la configuración no secreta es [`config/portfolio.json`](config/portfolio.json). Contiene el nombre, hostname del terminal, textos del asistente, metadatos SEO, preguntas, provider IA, Umami y fuente Markdown.
+
+Este archivo debe ser **JSON estricto**: no admite comentarios `//` ni `/* ... */`. Mantén las secciones `github`, `http` y `local` sin comentarlas; solo se utiliza la sección elegida por `content.mode`. Los textos que dependen del idioma, como `assistant.title`, aceptan un objeto `{ "fr": "...", "en": "...", "es": "..." }`.
+
+Docker monta este archivo al iniciar:
+
+```yaml
+volumes:
+  - ./config:/usr/share/nginx/html/config:ro
+  - ./content:/usr/share/nginx/html/data/content:ro
+  - ./private:/run/portfolio-private:ro
+```
+
+Edita los Markdown de `content/fr/`, `content/en/` y `content/es/` para actualizar los comandos. El navegador comprueba la versión configurada al iniciar y solo vuelve a descargar los archivos cuando cambia. El comando `question` usa el mismo contenido Markdown.
+
+### Métodos de hosting de Markdown
+
+- **GitHub público** — usa `content.mode: "github"` y configura `owner`, `repo`, `ref` y `path`. No se envía token, por lo que el repositorio debe ser público. Al abrir la página, el navegador comprueba el SHA y, si cambia, vuelve a descargar los 27 Markdown FR/EN/ES. No hace falta `deploy.sh`.
+- **HTTP/HTTPS, S3 o CDN** — usa `content.mode: "http"`, configura `baseUrl` y opcionalmente `versionUrl`. El origen debe permitir CORS.
+- **Volumen Docker local** — usa `content.mode: "local"` con `baseUrl: "/data/content"`. Compose monta `./content`; solo hace falta editar el archivo y recargar la página.
+
+Los archivos FR/EN/ES se cargan al abrir la página. Si falta un archivo EN o ES, se usa FR, y el Markdown incluido en el bundle queda como último fallback.
+
+### Contexto privado solo para la IA
+
+El contexto privado siempre es local al servidor, independientemente de `content.mode`. Crea `private/.IAinformation.md` desde el ejemplo. Git lo ignora, Docker lo monta fuera del directorio web y el backend lo lee en cada pregunta.
+
+```bash
+cp private/.IAinformation.example.md private/.IAinformation.md
+chmod 600 private/.IAinformation.md
+```
+
+Configura la ruta con `ai.privateContextFile: "/run/portfolio-private/.IAinformation.md"` y el límite de salida con `ai.maxOutputTokens: 5000`. Este límite solo afecta a la respuesta; la entrada Markdown y la salida comparten la ventana de contexto del modelo. No es una bóveda de secretos: el provider recibe el contenido y el modelo puede divulgar un dato relevante. No guardes contraseñas, claves API, tokens ni credenciales.
+
+### Variables de entorno
+
+| Variable | Descripción | Requerido |
+|---|---|---|
+| `AI_PROVIDER_API_KEY` | Clave del provider, conservada en el backend | Según el provider |
+| `PORT` | Puerto del host, por defecto `3012` | No |
+
+Los parámetros `providerType`, `providerUrl` y `model` están en `config/portfolio.json`. Los ejemplos OpenRouter, OpenAI y Ollama están en [`.env.example`](.env.example). Nunca pongas `AI_PROVIDER_API_KEY` en el frontend.
 
 Obtenga una clave gratuita en [openrouter.ai/keys](https://openrouter.ai/keys).
 
@@ -115,14 +155,26 @@ docker compose up -d --build
 
 | Ruta              | Descripción                  |
 |-------------------|------------------------------|
-| `/`               | SPA del portfolio terminal   |
+| `/`               | Split-screen asistente IA + CLI |
+| `/portfolio-cli/` | CLI local incluido |
 | `/health`         | JSON de verificación de salud |
 | `/cv/resume.pdf`  | PDF del CV                   |
-| `/api/question`   | Proxy OpenRouter (POST)      |
+| `/api/question`   | Proxy del provider configurado (POST)      |
 
-## ✏️ Personalizar el contenido
+## ✏️ Personalizar el portfolio
 
-Todo el contenido personal está en [`src/src/data/profile.ts`](src/src/data/profile.ts) — es el **único archivo a editar** para adaptar el portfolio a una nueva persona.
+Utiliza estos archivos:
+
+| Archivo | Función |
+|---|---|
+| [`config/portfolio.json`](config/portfolio.json) | Nombre, asistente, SEO, preguntas, provider, analytics y fuente Markdown |
+| [`content/fr/`](content/fr/) | Contenido francés y conocimiento IA |
+| [`content/en/`](content/en/) | Contenido inglés y conocimiento IA |
+| [`content/es/`](content/es/) | Contenido español y conocimiento IA |
+| [`src/src/data/profile.ts`](src/src/data/profile.ts) | Fallback estructurado y metadatos que aún usa el CLI (contactos, CV, iconos y comandos) |
+| [`src/src/i18n.ts`](src/src/i18n.ts) | Textos de la interfaz del terminal |
+
+`profile.ts` sigue siendo necesario. Los Markdown son la fuente editorial de los comandos y de la IA, pero este archivo todavía aporta fallbacks y datos estructurados a varios componentes del CLI. No lo elimines hasta migrar todos esos componentes a Markdown y `portfolio.json`.
 
 Campos clave al inicio de `profile.ts`:
 
@@ -131,15 +183,19 @@ Campos clave al inicio de `profile.ts`:
 | `firstName` | Usado en las preguntas de ejemplo IA (`question ¿cuáles son las habilidades de Juan?`) |
 | `name` | Nombre completo mostrado en el terminal |
 | `email`, `linkedinUrl`, `githubUrl` | Enlaces de contacto |
-| `terminalHost` | Dominio mostrado en el prompt del terminal |
+| `terminalHost` | Dominio mostrado en el prompt; configurado en `portfolio.json` |
 | `cvUrl` | URL del PDF del CV servido por el container |
 
 Las cadenas UI (3 idiomas) están en [`src/src/i18n.ts`](src/src/i18n.ts).
 
 Para reemplazar el CV: coloque su PDF en `src/public/cv/` con el nombre `resume.pdf` y actualice `cvUrl` en `profile.ts`.
 
+En modo local, define `content.mode` como `local`, usa `/data/content` en `config/portfolio.json` y modifica los archivos en `content/<locale>/`. El repositorio GitHub debe ser público porque no se usa ningún token.
+
+Para probar un cambio local, edita `content/fr/about.md`, recarga la página y ejecuta `about`. No hace falta reconstruir la imagen, reiniciar Compose ni ejecutar `deploy.sh`. En modo GitHub, haz commit del Markdown en la rama pública configurada y recarga la página; no hace falta redeploy. Solo se necesita rebuild al modificar la aplicación o usar contenido incluido en la imagen.
+
 ## 🔄 Reverse proxy (nginx / NPM)
 
 Si utiliza un reverse proxy, asegúrese de que reenvíe las solicitudes tal cual — la configuración nginx dentro del container gestiona directamente el enrutamiento SPA y los archivos estáticos.
 
-El service worker (PWA) excluye automáticamente `/health` y `/cv/` del fallback SPA.
+El service worker (PWA) excluye automáticamente `/health` y `/cv/` del fallback SPA. La configuración no secreta no se duplica en `.env`.

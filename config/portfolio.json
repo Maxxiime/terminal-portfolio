@@ -1,0 +1,61 @@
+{
+  "person": {
+    "name": "Maxime Lemenand",
+    "firstName": "Maxime",
+    "terminalHost": "maxime-lemenand.com"
+  },
+  "assistant": {
+    "displayName": "Assistant de Maxime",
+    "uri": "maxime://assistant",
+    "title": {
+      "fr": "Que voulez-vous savoir sur Maxime ?",
+      "en": "What would you like to know about Maxime?",
+      "es": "¿Qué quieres saber sobre Maxime?"
+    },
+    "subtitle": "DevOps · SRE · Automatisation · Self-hosting · AI Ops",
+    "disclaimer": "Markdown portfolio · réponses générées par IA"
+  },
+  "portfolioLabel": "Portfolio CLI",
+  "seo": {
+    "title": "Maxime Lemenand | Portfolio",
+    "description": "Infrastructure / DevOps terminal portfolio focused on automation, self-hosting and AI-assisted operations.",
+    "image": "/og-image.png"
+  },
+  "suggestions": {
+    "fr": [
+      "Résume son profil en 30 secondes",
+      "Retrace son parcours DevOps",
+      "Quelle est sa stack principale ?",
+      "Parle-moi de son lab IA & self-hosting"
+    ],
+    "en": [
+      "Summarize his profile in 30 seconds",
+      "Walk me through his DevOps career",
+      "What is his core technology stack?",
+      "Tell me about his AI and self-hosting lab"
+    ],
+    "es": [
+      "Resume su perfil en 30 segundos",
+      "Repasa su trayectoria DevOps",
+      "¿Cuál es su stack principal?",
+      "Háblame de su laboratorio de IA y self-hosting"
+    ]
+  },
+  "ai": {
+    "providerType": "openai-compatible",
+    "providerUrl": "https://openrouter.ai/api/v1/chat/completions",
+    "model": "openrouter/free",
+    "maxOutputTokens": 5000,
+    "privateContextFile": "/run/portfolio-private/.IAinformation.md"
+  },
+  "analytics": {
+    "umamiUrl": "",
+    "websiteId": ""
+  },
+  "content": {
+    "mode": "github",
+    "github": { "owner": "Maxxiime", "repo": "terminal-portfolio", "ref": "main", "path": "content" },
+    "http": { "baseUrl": "", "versionUrl": "" },
+    "local": { "baseUrl": "/data/content", "versionUrl": "" }
+  }
+}

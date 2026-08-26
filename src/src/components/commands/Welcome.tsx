@@ -7,6 +7,8 @@ import { profile } from "../../data/profile";
 import { useContext } from "react";
 import { languageContext } from "../../App";
 import { uiText } from "../../i18n";
+import { getMarkdownSections } from "../../data/markdown";
+import { getPortfolioConfig } from "../../data/portfolio-config";
 
 const renderWelcomeHint = (hint: string) => {
   const parts = hint.split(/(help|question)/g);
@@ -22,17 +24,23 @@ const renderWelcomeHint = (hint: string) => {
 const Welcome: React.FC = () => {
   const { locale } = useContext(languageContext);
   const copy = uiText[locale];
+  const config = getPortfolioConfig();
+  const markdownSections = getMarkdownSections(locale, "welcome");
+  const markdownProfile = markdownSections.find(section => section.title === profile.name || section.title === config.person.name);
+  const welcomeHeadline = markdownSections[0]?.title || copy.welcomeHeadline;
+  const markdownTagline = markdownProfile?.paragraphs[0] || profile.title;
+  const markdownHint = markdownProfile ? markdownProfile.paragraphs[1] || "" : copy.welcomeHint;
 
   return (
     <HeroContainer data-testid="welcome">
       <HeroMeta className="info-section">
-        <div>{copy.welcomeHeadline}</div>
+        <div>{welcomeHeadline}</div>
         <div aria-hidden="true">&nbsp;</div>
-        <div>{profile.name}</div>
-        <div>{profile.title}</div>
+        <div>{config.person.name}</div>
+        <div>{markdownTagline}</div>
         <div aria-hidden="true">&nbsp;</div>
-        <div>{renderWelcomeHint(copy.welcomeHint)}</div>
-        <div aria-hidden="true">&nbsp;</div>
+        {markdownHint && <div>{renderWelcomeHint(markdownHint)}</div>}
+        {markdownHint && <div aria-hidden="true">&nbsp;</div>}
       </HeroMeta>
     </HeroContainer>
   );

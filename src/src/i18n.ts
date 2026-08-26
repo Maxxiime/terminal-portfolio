@@ -95,6 +95,7 @@ export const uiText = {
       help: "voir les commandes disponibles",
       lab: "détails du homelab",
       language: "choisir la langue",
+      projects: "projets et expérimentations",
       question: "poser une question IA sur mon CV / portfolio",
       skills: "stack principale et outils",
       welcome: "afficher la section d'accueil",
@@ -204,8 +205,8 @@ export const uiText = {
     certificationsHeading: "Certifications",
     languagesHeading: "Langues",
     experienceHeading: "Expérience professionnelle",
-    experienceReplyHint: "Tape 1, 2 ou 3 pour ouvrir un poste.",
-    experienceSwitchHint: "Tape 1, 2 ou 3 pour changer de poste.",
+    experienceReplyHint: "Tape le numéro d'un poste pour afficher ses détails.",
+    experienceSwitchHint: "Tape un autre numéro pour changer de poste.",
     contactReplyHint: "Tape 1, 2, 3 ou 4 pour ouvrir le lien.",
     contactSwitchHint: "Tape 1, 2, 3 ou 4 pour ouvrir un autre lien.",
     labHeading: "Self-Hosted Infrastructure, Automation & AI Lab",
@@ -218,8 +219,8 @@ export const uiText = {
     languageCurrent: "Actuelle",
     languageReplyHint: "Tape 1, 2 ou 3 pour choisir la langue",
     commandNotFound: "commande introuvable",
-    exitFallback:
-      "Fermeture de l'onglet bloquée, redirection vers une page vide.",
+    exitDisconnected: "Session déconnectée.",
+    exitRestart: "Relancer la console",
   },
   en: {
     commandDescriptions: {
@@ -234,6 +235,7 @@ export const uiText = {
       help: "check available commands",
       lab: "self-hosted lab overview",
       language: "choose the language",
+      projects: "projects and experiments",
       question: "ask AI about my CV / portfolio",
       skills: "core stack and tools",
       welcome: "display hero section",
@@ -332,8 +334,8 @@ export const uiText = {
     certificationsHeading: "Certifications",
     languagesHeading: "Languages",
     experienceHeading: "Professional experience",
-    experienceReplyHint: "Type 1, 2 or 3 to open a role.",
-    experienceSwitchHint: "Type 1, 2 or 3 to switch roles.",
+    experienceReplyHint: "Type a role number to display its details.",
+    experienceSwitchHint: "Type another number to switch roles.",
     contactReplyHint: "Type 1, 2, 3 or 4 to open the link.",
     contactSwitchHint: "Type 1, 2, 3 or 4 to open another link.",
     labHeading: "Self-Hosted Infrastructure, Automation & AI Lab",
@@ -346,7 +348,8 @@ export const uiText = {
     languageCurrent: "Current",
     languageReplyHint: "Type 1, 2 or 3 to choose the language",
     commandNotFound: "command not found",
-    exitFallback: "Tab close was blocked, redirecting to a blank page.",
+    exitDisconnected: "Session disconnected.",
+    exitRestart: "Restart console",
   },
   es: {
     commandDescriptions: {
@@ -361,6 +364,7 @@ export const uiText = {
       help: "ver comandos disponibles",
       lab: "vista general del lab self-hosted",
       language: "elegir idioma",
+      projects: "proyectos y experimentos",
       question: "preguntar a la IA sobre mi CV / portfolio",
       skills: "stack principal y herramientas",
       welcome: "mostrar la sección de bienvenida",
@@ -465,8 +469,8 @@ export const uiText = {
     certificationsHeading: "Certificaciones",
     languagesHeading: "Idiomas",
     experienceHeading: "Experiencia profesional",
-    experienceReplyHint: "Escribe 1, 2 o 3 para abrir un puesto.",
-    experienceSwitchHint: "Escribe 1, 2 o 3 para cambiar de puesto.",
+    experienceReplyHint: "Escribe el número de un puesto para mostrar sus detalles.",
+    experienceSwitchHint: "Escribe otro número para cambiar de puesto.",
     contactReplyHint: "Escribe 1, 2, 3 o 4 para abrir el enlace.",
     contactSwitchHint: "Escribe 1, 2, 3 o 4 para abrir otro enlace.",
     labHeading: "Self-Hosted Infrastructure, Automation & AI Lab",
@@ -479,8 +483,8 @@ export const uiText = {
     languageCurrent: "Actual",
     languageReplyHint: "Escribe 1, 2 o 3 para elegir el idioma",
     commandNotFound: "comando no encontrado",
-    exitFallback:
-      "No se pudo cerrar la pestaña, redirigiendo a una página en blanco.",
+    exitDisconnected: "Sesión desconectada.",
+    exitRestart: "Reiniciar consola",
   },
 } as const;
 

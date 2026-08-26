@@ -14,29 +14,18 @@ server {
   resolver_timeout 5s;
   access_log /dev/stdout question_api if=$log_question_api;
 
-  set $openrouter_api_host openrouter.ai;
-
   location = /api/question {
-    proxy_pass https://$openrouter_api_host/api/v1/chat/completions;
+    proxy_pass http://127.0.0.1:3001/question;
     proxy_http_version 1.1;
-    proxy_set_header Host $openrouter_api_host;
-    proxy_ssl_server_name on;
-    proxy_ssl_name $openrouter_api_host;
+    proxy_set_header Host $host;
     proxy_set_header Content-Type "application/json";
-    proxy_set_header Authorization "Bearer ${OPENROUTER_API_KEY}";
-    proxy_set_header HTTP-Referer "https://maxime-lemenand.com";
-    proxy_set_header X-Title "Maxime Lemenand Terminal Portfolio";
     proxy_set_header X-Request-Id $http_x_request_id;
     proxy_set_header X-Request-Source $http_x_request_source;
     proxy_set_header X-Request-Model $http_x_request_model;
     proxy_set_header X-Request-Payload-Bytes $http_x_request_payload_bytes;
-    proxy_set_header Origin "";
-    proxy_set_header Referer "";
-    proxy_set_header Sec-Fetch-Site "";
-    proxy_set_header Sec-Fetch-Mode "";
-    proxy_set_header Sec-Fetch-Dest "";
+    proxy_set_header X-Forwarded-Proto $scheme;
     proxy_read_timeout 90s;
-    proxy_connect_timeout 15s;
+    proxy_connect_timeout 5s;
     proxy_send_timeout 90s;
   }
 
@@ -44,6 +33,25 @@ server {
     alias /usr/share/nginx/html/health.json;
     default_type application/json;
     add_header Cache-Control "no-store";
+  }
+
+  location = /index.html {
+    add_header Cache-Control "no-store, no-cache, must-revalidate";
+    try_files $uri =404;
+  }
+
+  # Runtime Markdown must never fall through to the SPA entry point. A missing
+  # document is a real 404; otherwise index.html would be parsed as portfolio
+  # content by the client.
+  location ^~ /data/content/ {
+    default_type text/markdown;
+    add_header Cache-Control "no-store, no-cache, must-revalidate";
+    try_files $uri =404;
+  }
+
+  location ^~ /config/ {
+    add_header Cache-Control "no-store, no-cache, must-revalidate";
+    try_files $uri =404;
   }
 
   location = /manifest.webmanifest {

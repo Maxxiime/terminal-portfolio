@@ -5,6 +5,8 @@ import GlobalStyle from "./components/styles/GlobalStyle";
 import Terminal from "./components/Terminal";
 import { getFromLS, setToLS } from "./utils/storage";
 import { Locale, resolveLocale, supportedLocales } from "./i18n";
+import { loadMarkdownContent } from "./data/markdown";
+import { initializeAnalytics, loadPortfolioConfig } from "./data/portfolio-config";
 
 export const languageContext = createContext<{
   locale: Locale;
@@ -38,8 +40,16 @@ const getInitialLocale = (): Locale => {
 
 function App() {
   const { theme, themeLoaded } = useTheme();
+  const [, setMarkdownVersion] = useState(0);
   const [browserLocale, setBrowserLocale] = useState<Locale>(detectBrowserLocale);
   const [locale, setSelectedLocale] = useState<Locale>(getInitialLocale);
+
+  useEffect(() => {
+    void Promise.all([loadPortfolioConfig(), loadMarkdownContent()]).then(() => {
+      initializeAnalytics();
+      setMarkdownVersion(version => version + 1);
+    });
+  }, []);
 
   useEffect(() => {
     window.addEventListener(

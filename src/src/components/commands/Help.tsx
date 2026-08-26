@@ -29,6 +29,7 @@ const commandIcons: Record<string, string> = {
   help: "🆘",
   lab: "🧪",
   language: "🌐",
+  projects: "🚀",
   question: "❓",
   skills: "🛠️",
   welcome: "👋",

@@ -36,7 +36,7 @@ An interactive terminal-style portfolio with AI-powered Q&A, multilingual suppor
 | Layer | Technology |
 |-------|-----------|
 | Frontend | React 18, TypeScript, Vite, styled-components |
-| Runtime | nginx:alpine (SPA routing + OpenRouter proxy) |
+| Runtime | nginx:alpine (SPA routing + configured provider proxy) |
 | Deploy | Docker + Docker Compose |
 
 ## 📁 Structure
@@ -45,14 +45,14 @@ An interactive terminal-style portfolio with AI-powered Q&A, multilingual suppor
 ├── src/              # React/Vite source
 │   ├── src/
 │   │   ├── components/
-│   │   ├── data/profile.ts   ← all personal content lives here
+│   │   ├── data/profile.ts   ← structured CLI fallback and metadata
 │   │   └── i18n.ts           ← UI strings (fr/en/es)
 │   └── public/
 │       ├── cv/               ← put your CV PDF here
 │       └── brands/           ← brand/certification icons
 ├── runtime/          # Docker build context
 │   ├── Dockerfile
-│   ├── nginx.conf.template   ← SPA routing + OpenRouter proxy
+│   ├── nginx.conf.template   ← SPA routing + provider proxy
 │   ├── health.sh             ← generates /health endpoint on startup
 │   └── dist/                 ← populated by deploy.sh (gitignored)
 ├── docker-compose.yml
@@ -63,28 +63,114 @@ An interactive terminal-style portfolio with AI-powered Q&A, multilingual suppor
 ## 🚀 Setup
 
 ```bash
-# 1. Clone
 git clone <repo-url>
 cd terminal-portfolio
-
-# 2. Configure environment
 cp .env.example .env
-# edit .env — set OPENROUTER_API_KEY and PORT
-
-# 3. Deploy
+# edit config/portfolio.json and .env
 ./deploy.sh
 ```
 
-The portfolio is available at `http://localhost:3012` (or your configured PORT).
+The portfolio is available at `http://localhost:3012` (or the host port selected with `PORT`).
 
-## 🔑 Environment variables
+One Docker image now contains the complete split-screen interface: AI assistant on the left, resizable separator, and the local CLI on the right. The CLI is served from `/portfolio-cli/` without depending on another domain.
 
-| Variable             | Description                          | Required |
-|----------------------|--------------------------------------|----------|
-| `OPENROUTER_API_KEY` | OpenRouter API key (free tier works) | Yes      |
-| `PORT`               | Host port (default: `3012`)          | No       |
+## 🔧 Configuration: one source for non-secrets
 
-Get a free key at [openrouter.ai/keys](https://openrouter.ai/keys).
+Edit [`config/portfolio.json`](config/portfolio.json) for every non-secret setting: person name, terminal hostname, assistant labels, SEO text, suggested questions, AI provider, Umami and Markdown source.
+
+This file must remain **strict JSON**: `//` and `/* ... */` comments are not allowed. Keep the `github`, `http`, and `local` sections present without commenting them out; only the section selected by `content.mode` is used. Language-dependent labels such as `assistant.title` accept an object like `{ "fr": "...", "en": "...", "es": "..." }`.
+
+Example provider configuration:
+
+```json
+"ai": {
+  "providerType": "openai-compatible",
+  "providerUrl": "https://openrouter.ai/api/v1/chat/completions",
+  "model": "openrouter/free",
+  "maxOutputTokens": 5000,
+  "privateContextFile": "/run/portfolio-private/.IAinformation.md"
+}
+```
+
+`maxOutputTokens` limits only the generated response. Markdown input and output share the model context window. The backend accepts a configurable value up to `8192` tokens.
+
+For OpenAI, use `https://api.openai.com/v1/chat/completions` and a model such as `gpt-4o-mini`. For Ollama, use `http://ollama:11434/v1/chat/completions` and a locally available model. The provider must accept the OpenAI chat-completions request format.
+
+Only secrets belong in `.env`:
+
+| Variable | Purpose | Required |
+|---|---|---|
+| `AI_PROVIDER_API_KEY` | Provider key, kept by the server-side backend | Depends on provider |
+| `PORT` | Host port, default `3012` | No |
+
+Ollama usually does not need an API key, so leave `AI_PROVIDER_API_KEY` empty. Never put a provider key in `config/portfolio.json` or frontend code. See [`.env.example`](.env.example) for examples.
+
+Docker mounts this file at runtime, so it can be changed without rebuilding the image:
+
+```yaml
+volumes:
+  - ./config:/usr/share/nginx/html/config:ro
+  - ./content:/usr/share/nginx/html/data/content:ro
+  - ./private:/run/portfolio-private:ro
+```
+
+Edit the Markdown files in `content/fr/`, `content/en/`, and `content/es/` to update the command output. The browser checks the configured source version at startup and only downloads the files again when it changes. The `question` command uses the same Markdown content.
+
+### Markdown hosting methods
+
+Choose one method with `content.mode`. Settings for inactive modes are ignored.
+
+#### 1. Public GitHub
+
+```json
+"content": {
+  "mode": "github",
+  "github": {
+    "owner": "Maxxiime",
+    "repo": "terminal-portfolio",
+    "ref": "main",
+    "path": "content"
+  }
+}
+```
+
+The repository must be public because no GitHub token is sent. Edit `content/<locale>/<topic>.md`, commit and push to the branch configured in `ref`, then reload the page. The browser checks that branch's commit SHA and fetches all FR/EN/ES files when it changes. The Docker server does not need `git pull` or `deploy.sh`.
+
+#### 2. Local Docker volume
+
+```json
+"content": {
+  "mode": "local",
+  "local": {
+    "baseUrl": "/data/content",
+    "versionUrl": ""
+  }
+}
+```
+
+Compose mounts `./content` at `/usr/share/nginx/html/data/content:ro`. Edit `content/<locale>/<topic>.md` directly on the server and reload the page. No rebuild, `deploy.sh`, or container restart is required.
+
+#### Optional: HTTP/HTTPS, S3 or CDN
+
+Set `content.mode` to `http`, configure `http.baseUrl`, and optionally `http.versionUrl`. The origin must allow browser CORS. The version endpoint may return text or JSON with `sha` or `version`.
+
+All FR/EN/ES files are loaded when the main page opens. Missing EN/ES files fall back to FR, and bundled Markdown remains the final fallback when an external source is unavailable.
+
+### Private AI-only context
+
+Private context is always a local server-side file, regardless of the public Markdown `content.mode`. Never place it under `content/` or in a public GitHub repository.
+
+```bash
+cp private/.IAinformation.example.md private/.IAinformation.md
+chmod 600 private/.IAinformation.md
+# edit private/.IAinformation.md
+```
+
+The path is configured with `ai.privateContextFile`. The file is ignored by Git, mounted outside nginx's public web root and read by the backend for every question. Changes require no rebuild or restart. Its contents never appear in CLI commands and are never sent to the browser.
+
+This is conditional AI context, not a secret vault. The configured provider receives it and the model may disclose a relevant fact in an answer. Never store passwords, API keys, tokens or credentials in this file.
+
+Get an OpenRouter key at [openrouter.ai/keys](https://openrouter.ai/keys).
 
 ## 🧑‍💻 Development
 
@@ -115,14 +201,26 @@ docker compose up -d --build
 
 | Path              | Description             |
 |-------------------|-------------------------|
-| `/`               | Terminal portfolio SPA  |
+| `/`               | Split-screen AI assistant + CLI |
+| `/portfolio-cli/` | Embedded local CLI |
 | `/health`         | Health check JSON       |
 | `/cv/resume.pdf`  | CV PDF                  |
-| `/api/question`   | OpenRouter proxy (POST) |
+| `/api/question`   | Configured provider proxy (POST) |
 
-## ✏️ Customizing content
+## ✏️ Customizing the portfolio
 
-All personal content is in [`src/src/data/profile.ts`](src/src/data/profile.ts) — this is the **single file to edit** when adapting the portfolio to a new person.
+Use these files when adapting the portfolio to a new person:
+
+| File | Purpose |
+|---|---|
+| [`config/portfolio.json`](config/portfolio.json) | Name, assistant labels, SEO metadata, questions, provider, analytics and Markdown source |
+| [`content/fr/`](content/fr/) | French command content and AI knowledge |
+| [`content/en/`](content/en/) | English command content and AI knowledge |
+| [`content/es/`](content/es/) | Spanish command content and AI knowledge |
+| [`src/src/data/profile.ts`](src/src/data/profile.ts) | Structured fallback and CLI metadata still used by contacts, CV, icons, and commands |
+| [`src/src/i18n.ts`](src/src/i18n.ts) | Terminal UI strings in the three languages |
+
+`profile.ts` is still required. Markdown is the editorial source for commands and AI answers, while this file still supplies fallback and structured data to several CLI components. Do not remove it until those components have all been migrated to Markdown and `portfolio.json`.
 
 Key fields at the top of `profile.ts`:
 
@@ -131,12 +229,14 @@ Key fields at the top of `profile.ts`:
 | `firstName` | Used in AI example questions (`question what are John's skills?`) |
 | `name` | Full name displayed in the terminal |
 | `email`, `linkedinUrl`, `githubUrl` | Contact links |
-| `terminalHost` | Domain shown in the terminal prompt |
+| `terminalHost` | Domain shown in the terminal prompt; configured in `portfolio.json` |
 | `cvUrl` | URL of the CV PDF served by the container |
 
-UI strings (3 languages) are in [`src/src/i18n.ts`](src/src/i18n.ts).
-
 To replace the CV: drop your PDF in `src/public/cv/` as `resume.pdf` and update `cvUrl` in `profile.ts`.
+
+For local Markdown mode, set `content.mode` to `local`, use `/data/content` in `config/portfolio.json`, and edit files under `content/<locale>/`. GitHub mode must use a public repository because the browser does not send a GitHub token.
+
+If you edit a mounted local Markdown file, reload the browser; no image rebuild, Compose restart or `deploy.sh` is needed. For GitHub mode, commit the Markdown change to the configured public branch and reload the browser; deployment is not needed. Rebuild only when changing the application itself or using bundled content.
 
 ## 🔄 Reverse proxy (nginx / NPM)
 

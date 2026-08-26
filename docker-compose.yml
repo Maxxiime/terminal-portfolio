@@ -6,9 +6,13 @@ services:
     container_name: terminal-portfolio
     restart: unless-stopped
     environment:
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - AI_PROVIDER_API_KEY=${AI_PROVIDER_API_KEY:-}
       - NODE_OPTIONS=--dns-result-order=ipv4first
       - DNS_RESULT_ORDER=ipv4first
+    volumes:
+      - ./config:/usr/share/nginx/html/config:ro
+      - ./content:/usr/share/nginx/html/data/content:ro
+      - ./private:/run/portfolio-private:ro
     dns:
       - 1.1.1.1
       - 8.8.8.8

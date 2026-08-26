@@ -1,11 +1,14 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { termContext, terminalActionsContext } from "../Terminal";
-import { getPortfolioKnowledgeBase, profile } from "../../data/profile";
+import { profile } from "../../data/profile";
+import { getMarkdownKnowledgeBase } from "../../data/markdown";
 import { Wrapper } from "../styles/Output.styled";
 import { languageContext } from "../../App";
 import { answerLanguageNames, uiText } from "../../i18n";
 import LinkifiedText from "../LinkifiedText";
+import { getPortfolioConfig } from "../../data/portfolio-config";
+import { createRequestId } from "../../utils/request-id";
 
 const UsageHint = styled.span`
   color: ${({ theme }) => theme.colors?.secondary};
@@ -46,7 +49,7 @@ const answerCache = new Map<string, string>();
 const spinnerFrames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
 const getCompactPortfolioContext = (locale: "fr" | "en" | "es") =>
-  getPortfolioKnowledgeBase(locale)
+  getMarkdownKnowledgeBase(locale)
     .replace(/\n{3,}/g, "\n\n");
 
 type QuestionProviderConfig = {
@@ -55,38 +58,42 @@ type QuestionProviderConfig = {
   timeoutMs: number;
 };
 
-const QUESTION_PROVIDER: QuestionProviderConfig = {
+const getQuestionProvider = (): QuestionProviderConfig => ({
   endpoint: "/api/question",
-  models: ["openrouter/free"],
+  models: [getPortfolioConfig().ai.model],
   timeoutMs: 45000,
-};
+});
 
 const buildPrompt = (
   question: string,
   locale: "fr" | "en" | "es",
-  model = QUESTION_PROVIDER.models[0]
-) => ({
-  model,
-  messages: [
-    {
-      role: "system",
-      content: `You answer questions about Maxime Lemenand's CV and terminal portfolio. Use only the provided portfolio context. Do not invent missing details. Keep the answer direct, natural and concise. Always refer to Maxime Lemenand in the third person by name — never use "tu", "vous", "you" or any second-person form. Always answer in ${answerLanguageNames[locale]}.`,
-    },
-    {
-      role: "user",
-      content: `Portfolio context:
+  model: string
+) => {
+  const ownerName = getPortfolioConfig().person.name;
+
+  return {
+    model,
+    messages: [
+      {
+        role: "system",
+        content: `You answer questions about ${ownerName}'s CV and terminal portfolio. Use only the provided portfolio context. Do not invent missing details. Keep the answer direct and natural. Always refer to ${ownerName} in the third person by name — never use "tu", "vous", "you" or any second-person form. Always answer in ${answerLanguageNames[locale]}.`,
+      },
+      {
+        role: "user",
+        content: `Portfolio context:
 ${getCompactPortfolioContext(locale)}
 
 Question: ${question}
 
-Answer in 2 to 4 concise sentences in ${answerLanguageNames[locale]}. Never cut off mid-sentence.`,
-    },
-  ],
-  temperature: 0.25,
-  // eslint-disable-next-line camelcase
-  max_tokens: 2000,
-  stream: false,
-});
+Answer in ${answerLanguageNames[locale]}. If the question asks for the complete history, every experience, all projects, or a detailed answer, include every matching Markdown entry with its dates and relevant details. Otherwise stay concise. Never cut off an item or sentence.`,
+      },
+    ],
+    temperature: 0.25,
+    // eslint-disable-next-line camelcase
+    max_tokens: getPortfolioConfig().ai.maxOutputTokens,
+    stream: false,
+  };
+};
 
 const extractErrorMessage = (raw: string, locale: "fr" | "en" | "es") => {
   const copy = uiText[locale];
@@ -164,6 +171,7 @@ const Question: React.FC = () => {
   const { arg } = useContext(termContext);
   const { locale } = useContext(languageContext);
   const copy = uiText[locale];
+  const config = getPortfolioConfig();
   const { typeAndExecute } = useContext(terminalActionsContext);
   const question = useMemo(() => arg.join(" ").trim(), [arg]);
   const cacheKey = `${locale}::${question}`;
@@ -185,7 +193,7 @@ const Question: React.FC = () => {
 
     if (!question) return;
 
-    const requestId = crypto.randomUUID();
+    const requestId = createRequestId();
     let cancelled = false;
     setState({ status: "loading", answer: "" });
 
@@ -211,6 +219,7 @@ const Question: React.FC = () => {
               "X-Request-Source": "Question.tsx",
               "X-Request-Model": model,
               "X-Request-Payload-Bytes": String(payloadText.length),
+              "X-Portfolio-Language": locale,
             },
             body: payloadText,
             signal: controller.signal,
@@ -247,7 +256,7 @@ const Question: React.FC = () => {
 
     const askQuestion = async () => {
       try {
-        const answer = await askQuestionProvider(QUESTION_PROVIDER);
+          const answer = await askQuestionProvider(getQuestionProvider());
 
         if (!cancelled) {
           answerCache.set(cacheKey, answer);
@@ -313,7 +322,7 @@ const Question: React.FC = () => {
         </div>
         <ExampleList>
           <div>{copy.questionExamplesTitle}</div>
-          {copy.questionExamples(profile.firstName).map((ex: string) => (
+          {(getPortfolioConfig().suggestions[locale].length ? getPortfolioConfig().suggestions[locale].map((item) => `question ${item}`) : copy.questionExamples(config.person.firstName)).map((ex: string) => (
             <ExampleItem key={ex} onClick={() => typeAndExecute(ex)}>
               {ex}
             </ExampleItem>
