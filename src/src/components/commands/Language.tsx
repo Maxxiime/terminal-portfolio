@@ -1,4 +1,4 @@
-import { useContext, useLayoutEffect } from "react";
+import { useContext, useLayoutEffect, useRef } from "react";
 import { languageContext } from "../../App";
 import { localeLabels, uiText, type Locale } from "../../i18n";
 import { termContext } from "../Terminal";
@@ -33,12 +33,14 @@ const Language: React.FC = () => {
   const selectedToken = arg[0];
   const selectedChoice = resolveLanguageChoice(selectedToken);
   const copy = uiText[locale];
+  const executed = useRef(false);
 
   useLayoutEffect(() => {
-    if (rerender && index === 0 && selectedChoice) {
+    if (!executed.current && rerender && index === 0 && selectedChoice && arg.length === 1) {
+      executed.current = true;
       setLocale(selectedChoice.locale);
     }
-  }, [index, rerender, selectedChoice, setLocale]);
+  }, [arg.length, index, rerender, selectedChoice, setLocale]);
 
   if (arg.length > 1 || (selectedToken && !selectedChoice)) {
     return (

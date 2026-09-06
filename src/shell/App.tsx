@@ -9,7 +9,9 @@ import {
   loadPortfolioConfig,
   type PortfolioRuntimeConfig,
 } from "../src/data/portfolio-config";
-import { resolveLocale, type Locale } from "../src/i18n";
+import type { Locale } from "../src/i18n";
+import { usePortfolioLanguage } from "../src/hooks/usePortfolioLanguage";
+import LanguageSelector from "./LanguageSelector";
 import { createRequestId } from "../src/utils/request-id";
 
 type Message = { role: "assistant" | "user"; content: string };
@@ -87,7 +89,7 @@ function extractProviderError(raw: string, fallback: string) {
 
 export default function App() {
   const [config, setConfig] = useState<PortfolioRuntimeConfig>(getPortfolioConfig());
-  const [language, setLanguage] = useState<Locale>(() => resolveLocale(localStorage.getItem("portfolio-language") || navigator.language));
+  const { locale: language, setLocale: changeLanguage } = usePortfolioLanguage();
   const [activePanel, setActivePanel] = useState<"chat" | "terminal">("chat");
   const [chatWidth, setChatWidth] = useState(42);
   const [contentReady, setContentReady] = useState(false);
@@ -152,13 +154,6 @@ export default function App() {
     if (config.content.mode === "http") return config.content.http.baseUrl || "HTTP";
     return "volume local";
   }, [config]);
-
-  function changeLanguage(next: Locale) {
-    setLanguage(next);
-    localStorage.setItem("portfolio-language", next);
-    localStorage.setItem("tsn-language", next);
-    document.documentElement.lang = next;
-  }
 
   async function ask(value: string) {
     const clean = value.trim();
@@ -228,9 +223,7 @@ export default function App() {
           <span className="mobile-switch-title">{terminalTab}</span>
         </button>
       </nav>
-      <select className="mobile-language" aria-label="Language" value={language} onChange={event => changeLanguage(event.target.value as Locale)}>
-        <option value="fr">FR</option><option value="en">EN</option><option value="es">ES</option>
-      </select>
+      <LanguageSelector locale={language} onChange={changeLanguage} />
       </header>
 
       <section id="chat-panel" className={`chat-panel ${messages.length === 0 ? "chat-empty" : ""} ${activePanel === "chat" ? "mobile-active" : ""}`}>

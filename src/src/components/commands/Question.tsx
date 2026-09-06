@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import { termContext, terminalActionsContext } from "../Terminal";
 import { profile } from "../../data/profile";
@@ -171,10 +171,14 @@ const Question: React.FC = () => {
   const { arg } = useContext(termContext);
   const { locale } = useContext(languageContext);
   const copy = uiText[locale];
+  // A history entry keeps the language it had when submitted.
+  const [requestLocale] = useState(locale);
+  const requestCopy = uiText[requestLocale];
+  const requestRef = useRef<{ key: string; promise: Promise<string> } | null>(null);
   const config = getPortfolioConfig();
   const { typeAndExecute } = useContext(terminalActionsContext);
   const question = useMemo(() => arg.join(" ").trim(), [arg]);
-  const cacheKey = `${locale}::${question}`;
+  const cacheKey = `${requestLocale}::${question}`;
   const [frameIndex, setFrameIndex] = useState(0);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [state, setState] = useState<QaState>(() => {
@@ -209,7 +213,7 @@ const Question: React.FC = () => {
         const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
 
         try {
-          const payload = buildPrompt(question, locale, model);
+          const payload = buildPrompt(question, requestLocale, model);
           const payloadText = JSON.stringify(payload);
           const response = await fetch(endpoint, {
             method: "POST",
@@ -219,7 +223,7 @@ const Question: React.FC = () => {
               "X-Request-Source": "Question.tsx",
               "X-Request-Model": model,
               "X-Request-Payload-Bytes": String(payloadText.length),
-              "X-Portfolio-Language": locale,
+              "X-Portfolio-Language": requestLocale,
             },
             body: payloadText,
             signal: controller.signal,
@@ -228,7 +232,7 @@ const Question: React.FC = () => {
           const raw = await response.text();
 
           if (!response.ok) {
-            throw new Error(extractErrorMessage(raw, locale));
+            throw new Error(extractErrorMessage(raw, requestLocale));
           }
 
           const data = raw ? JSON.parse(raw) : {};
@@ -238,11 +242,11 @@ const Question: React.FC = () => {
             return answer;
           }
 
-          lastError = new Error(copy.questionFallback);
+          lastError = new Error(requestCopy.questionFallback);
         } catch (error) {
           lastError =
             error instanceof DOMException && error.name === "AbortError"
-              ? new Error(copy.questionTimeout)
+              ? new Error(requestCopy.questionTimeout)
               : error;
         } finally {
           window.clearTimeout(timeout);
@@ -251,12 +255,16 @@ const Question: React.FC = () => {
 
       throw lastError instanceof Error
         ? lastError
-        : new Error(copy.questionServiceUnavailable);
+        : new Error(requestCopy.questionServiceUnavailable);
     };
 
     const askQuestion = async () => {
       try {
-          const answer = await askQuestionProvider(getQuestionProvider());
+        // Reuse an in-flight request during React StrictMode effect replay.
+        if (!requestRef.current || requestRef.current.key !== cacheKey) {
+          requestRef.current = { key: cacheKey, promise: askQuestionProvider(getQuestionProvider()) };
+        }
+        const answer = await requestRef.current.promise;
 
         if (!cancelled) {
           answerCache.set(cacheKey, answer);
@@ -267,7 +275,7 @@ const Question: React.FC = () => {
           const message =
             error instanceof Error
               ? error.message
-              : copy.questionServiceUnavailable;
+              : requestCopy.questionServiceUnavailable;
           setState({ status: "error", answer: message });
         }
       }
@@ -278,14 +286,7 @@ const Question: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [
-    cacheKey,
-    copy.questionFallback,
-    copy.questionServiceUnavailable,
-    copy.questionTimeout,
-    locale,
-    question,
-  ]);
+  }, [cacheKey, question, requestLocale, requestCopy]);
 
   useEffect(() => {
     if (state.status !== "loading") {

@@ -13,8 +13,6 @@
   .mobile-header{display:flex;align-items:center;gap:8px;min-width:0;padding:6px 10px;padding-top:calc(6px + env(safe-area-inset-top,0px));background:#11181c;border-bottom:1px solid #42545f}
   .mobile-identity{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;color:#f4f4f5;font-size:.875rem;font-weight:650}
   .mobile-switch{display:flex;flex:1;justify-content:center;gap:5px;min-width:0}
-  .mobile-language{flex:0 0 52px;width:52px;min-height:44px;border:1px solid #42545f;border-radius:8px;background:#202c35;color:#f4f4f5;font:inherit;font-size:.875rem;cursor:pointer}
-  .mobile-language:focus-visible{outline:2px solid #f4f4f5;outline-offset:2px}
   .mobile-switch button{position:relative;display:grid;grid-template-columns:18px minmax(0,auto);justify-content:center;align-content:center;align-items:center;gap:6px;min-width:0;min-height:44px;padding:8px;border:1px solid #607785;border-radius:10px;background:#202c35;color:#f4f4f5;text-align:left;cursor:pointer;transition:background .16s ease,border-color .16s ease,color .16s ease}
   .mobile-switch-title{min-width:0;font-size:.875rem;font-weight:650;line-height:1.3;letter-spacing:-.025em;overflow-wrap:anywhere}
   .mobile-switch-icon{display:grid;place-items:center;width:18px;height:18px}
@@ -28,7 +26,6 @@
   .suggestions{grid-template-columns:1fr}
   .thread-content{padding:18px 14px}
   .panel-header,.terminal-bar{display:none}
-  .chat-empty .thread-viewport{flex:0 1 auto}
   .thread-content.thread-empty{justify-content:flex-start;min-height:0;padding:24px 16px 12px}
   .agent-home{align-items:flex-start;padding:0;text-align:left}
   .prompt-logo{display:none}
@@ -36,11 +33,26 @@
   .agent-home p{font-size:14px;line-height:1.5}
   .suggestions{gap:8px;margin-top:20px;max-width:none}
   .suggestions button{min-height:44px;padding:10px 12px;font-size:14px;line-height:1.4}
-  .thread-footer{padding:8px 16px 12px}
-  .chat-empty .thread-footer{border-top:0}
+  .thread-footer{padding:8px 16px calc(12px + env(safe-area-inset-bottom,0px))}
   .composer textarea{font-size:16px}
   .composer-actions button{width:36px;height:36px}
   .disclaimer{font-size:11px;color:#a1a1aa}
 }
 @media(max-width:900px) and (hover:hover){.mobile-switch button:not(.active):hover{background:#2c3d48;border-color:#a3bdcb}}
 @media(prefers-reduced-motion:reduce){.mobile-switch button{transition:none}}
+
+.language-picker{position:relative;flex:0 0 auto}
+.language-picker-trigger{display:flex;align-items:center;justify-content:center;gap:4px;min-height:44px;padding:8px;border:1px solid #42545f;border-radius:10px;background:linear-gradient(145deg,#24343e,#17242c);color:#e6f3f0;font-size:14px;font-weight:600;cursor:pointer;box-shadow:inset 0 1px 0 #ffffff0d;transition:border-color .16s ease,background .16s ease}
+.language-picker-trigger:hover,.language-picker-trigger[aria-expanded="true"]{border-color:#5bd2b2;background:#20382f}
+.language-picker-trigger:focus-visible,.language-picker-option:focus-visible{outline:2px solid #5bd2b2;outline-offset:2px}
+.language-chevron{width:14px;height:14px;color:#a7c1b9;transition:transform .16s ease}
+.language-picker-trigger[aria-expanded="true"] .language-chevron{transform:rotate(180deg)}
+.language-picker-popover{position:absolute;z-index:30;top:calc(100% + 8px);right:0;width:210px;max-width:calc(100vw - 20px);padding:6px;border:1px solid #415851;border-radius:14px;background:#15201e;box-shadow:0 16px 40px #0008,inset 0 1px 0 #ffffff08}
+.language-picker-heading{padding:8px 10px 10px;color:#a9bcb5;font-size:12px;line-height:1.4}
+.language-picker-option{display:flex;align-items:center;gap:10px;width:100%;min-height:46px;padding:8px;border:1px solid transparent;border-radius:9px;background:transparent;color:#edf4f1;text-align:left;font-size:14px;cursor:pointer}
+.language-picker-option:hover{background:#22332e}
+.language-picker-option[aria-selected="true"]{border-color:#375d4f;background:#203b30}
+.language-code{display:grid;place-items:center;flex:0 0 30px;height:28px;border:1px solid #3a5048;border-radius:6px;background:#ffffff05;color:#b9d5c9;font-size:12px;font-weight:600}
+.language-picker-option[aria-selected="true"] .language-code{border-color:#5bd2b266;color:#82e4c5}
+.language-check{width:16px;height:16px;margin-left:auto;color:#7ee6c4}
+@media(prefers-reduced-motion:reduce){.language-picker-trigger,.language-chevron{transition:none}}

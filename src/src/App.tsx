@@ -3,8 +3,8 @@ import { ThemeProvider } from "styled-components";
 import { useTheme } from "./hooks/useTheme";
 import GlobalStyle from "./components/styles/GlobalStyle";
 import Terminal from "./components/Terminal";
-import { getFromLS, setToLS } from "./utils/storage";
-import { Locale, resolveLocale, supportedLocales } from "./i18n";
+import type { Locale } from "./i18n";
+import { usePortfolioLanguage } from "./hooks/usePortfolioLanguage";
 import { loadMarkdownContent } from "./data/markdown";
 import { initializeAnalytics, loadPortfolioConfig } from "./data/portfolio-config";
 
@@ -18,31 +18,10 @@ export const languageContext = createContext<{
   setLocale: () => undefined,
 });
 
-const detectBrowserLocale = (): Locale => {
-  if (typeof window === "undefined") return "en";
-
-  const candidates = [
-    ...(window.navigator.languages || []),
-    window.navigator.language,
-  ].filter(Boolean);
-
-  const matched = candidates.find(candidate =>
-    supportedLocales.some(locale => candidate.toLowerCase().startsWith(locale))
-  );
-
-  return resolveLocale(matched || window.navigator.language);
-};
-
-const getInitialLocale = (): Locale => {
-  if (typeof window === "undefined") return "en";
-  return resolveLocale(getFromLS("tsn-language") || detectBrowserLocale());
-};
-
 function App() {
   const { theme, themeLoaded } = useTheme();
   const [, setMarkdownVersion] = useState(0);
-  const [browserLocale, setBrowserLocale] = useState<Locale>(detectBrowserLocale);
-  const [locale, setSelectedLocale] = useState<Locale>(getInitialLocale);
+  const { locale, browserLocale, setLocale } = usePortfolioLanguage();
 
   useEffect(() => {
     void Promise.all([loadPortfolioConfig(), loadMarkdownContent()]).then(() => {
@@ -62,17 +41,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const detected = detectBrowserLocale();
-    const saved = getFromLS("tsn-language");
-    setBrowserLocale(detected);
-    setSelectedLocale(resolveLocale(saved || detected));
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.lang = locale;
-  }, [locale]);
-
-  useEffect(() => {
     const themeColor = theme.colors?.body;
 
     const metaThemeColor = document.querySelector("meta[name=theme-color]");
@@ -86,11 +54,6 @@ function App() {
     maskIcon && maskIcon.setAttribute("color", themeColor);
   }, [theme]);
 
-  const localeSwitcher = (nextLocale: Locale) => {
-    setToLS("tsn-language", nextLocale);
-    setSelectedLocale(nextLocale);
-  };
-
   return (
     <>
       <h1 className="sr-only" aria-label="Terminal Portfolio">
@@ -100,7 +63,7 @@ function App() {
         <ThemeProvider theme={theme}>
           <GlobalStyle />
           <languageContext.Provider
-            value={{ locale, browserLocale, setLocale: localeSwitcher }}
+            value={{ locale, browserLocale, setLocale }}
           >
             <Terminal />
           </languageContext.Provider>
