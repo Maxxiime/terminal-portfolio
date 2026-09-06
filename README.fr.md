@@ -83,6 +83,8 @@ Une seule image Docker contient maintenant l'interface split-screen complète : 
 
 Le fichier unique à modifier pour les réglages non secrets est [`config/portfolio.json`](config/portfolio.json). Il contient le nom, le hostname du terminal, les textes de l'assistant, les métadonnées SEO, les questions, le provider IA, Umami et la source Markdown.
 
+Les libellés des onglets mobiles se règlent avec `tabs.assistant` et `tabs.terminal` : chaque valeur accepte une chaîne commune ou un objet `{ "fr": "...", "en": "...", "es": "..." }`. Après cette mise à jour de l’application, un rechargement de page suffit pour appliquer une modification du JSON servi par le site, sans reconstruire le frontend. Si un libellé est absent ou vide, `assistant.uri` ou `portfolioLabel` est utilisé.
+
 Ce fichier doit rester du **JSON strict** : les commentaires `//` et `/* ... */` ne sont pas autorisés. Gardez les sections `github`, `http` et `local` présentes sans les commenter ; seule celle sélectionnée par `content.mode` est utilisée. Les textes qui changent avec la langue, comme `assistant.title`, acceptent un objet `{ "fr": "...", "en": "...", "es": "..." }`.
 
 Docker monte ce fichier au démarrage :

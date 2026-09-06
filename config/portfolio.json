@@ -16,6 +16,10 @@
     "disclaimer": "Markdown portfolio · réponses générées par IA"
   },
   "portfolioLabel": "Portfolio CLI",
+  "tabs": {
+    "assistant": { "fr": "Assistant", "en": "Assistant", "es": "Asistente" },
+    "terminal": "CLI"
+  },
   "seo": {
     "title": "Maxime Lemenand | Portfolio",
     "description": "Infrastructure / DevOps terminal portfolio focused on automation, self-hosting and AI-assisted operations.",

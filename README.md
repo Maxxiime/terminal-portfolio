@@ -78,6 +78,8 @@ One Docker image now contains the complete split-screen interface: AI assistant 
 
 Edit [`config/portfolio.json`](config/portfolio.json) for every non-secret setting: person name, terminal hostname, assistant labels, SEO text, suggested questions, AI provider, Umami and Markdown source.
 
+Configure mobile tab labels with `tabs.assistant` and `tabs.terminal`. Each accepts a shared string or a `{ "fr": "...", "en": "...", "es": "..." }` object. Once this application update is installed, reload the page to apply edits to the JSON served by the site without rebuilding the frontend. Missing or empty labels fall back to `assistant.uri` or `portfolioLabel`.
+
 This file must remain **strict JSON**: `//` and `/* ... */` comments are not allowed. Keep the `github`, `http`, and `local` sections present without commenting them out; only the section selected by `content.mode` is used. Language-dependent labels such as `assistant.title` accept an object like `{ "fr": "...", "en": "...", "es": "..." }`.
 
 Example provider configuration:

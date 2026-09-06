@@ -83,6 +83,8 @@ Una sola imagen Docker contiene ahora la interfaz split-screen completa: asisten
 
 El archivo único para toda la configuración no secreta es [`config/portfolio.json`](config/portfolio.json). Contiene el nombre, hostname del terminal, textos del asistente, metadatos SEO, preguntas, provider IA, Umami y fuente Markdown.
 
+Configura los nombres de las pestañas móviles con `tabs.assistant` y `tabs.terminal`. Cada valor acepta una cadena común o un objeto `{ "fr": "...", "en": "...", "es": "..." }`. Una vez instalada esta actualización de la aplicación, basta con recargar la página para aplicar los cambios del JSON servido por el sitio, sin reconstruir el frontend. Si falta un nombre o está vacío, se utiliza `assistant.uri` o `portfolioLabel`.
+
 Este archivo debe ser **JSON estricto**: no admite comentarios `//` ni `/* ... */`. Mantén las secciones `github`, `http` y `local` sin comentarlas; solo se utiliza la sección elegida por `content.mode`. Los textos que dependen del idioma, como `assistant.title`, aceptan un objeto `{ "fr": "...", "en": "...", "es": "..." }`.
 
 Docker monta este archivo al iniciar:

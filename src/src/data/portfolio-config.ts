@@ -6,6 +6,7 @@ export type PortfolioRuntimeConfig = {
   person: { name: string; firstName: string; terminalHost: string };
   assistant: { displayName: string; uri: string; title: LocalizedText; subtitle: LocalizedText; disclaimer: LocalizedText };
   portfolioLabel: string;
+  tabs: { assistant: LocalizedText; terminal: LocalizedText };
   ai: { providerType: string; providerUrl: string; model: string; maxOutputTokens: number; privateContextFile: string };
   analytics: { umamiUrl: string; websiteId: string };
   seo: { title: string; description: string; image: string };
@@ -32,6 +33,7 @@ export const defaultPortfolioConfig: PortfolioRuntimeConfig = {
     disclaimer: "Markdown content · AI-generated answers",
   },
   portfolioLabel: "portfolio.cli",
+  tabs: { assistant: "", terminal: "" },
   ai: {
     providerType: "openai-compatible",
     providerUrl: "https://openrouter.ai/api/v1/chat/completions",
@@ -78,6 +80,7 @@ const mergeConfig = (
   },
   assistant: { ...base.assistant, ...input.assistant },
   portfolioLabel: input.portfolioLabel || base.portfolioLabel,
+  tabs: { ...base.tabs, ...input.tabs },
   ai: {
     ...base.ai,
     ...input.ai,

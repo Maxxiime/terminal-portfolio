@@ -21,12 +21,7 @@ const text = {
     send: "Envoyer",
     inference: "inférence en cours",
     unavailable: "L’assistant est momentanément indisponible.",
-    terminal: "Portfolio CLI",
     panelSwitcher: "Choisir une façon de découvrir mon profil",
-    chatHint: "Poser une question",
-    chatTab: "Assistant IA",
-    mobileChatTab: "Assistant",
-    terminalHint: "Explorer les commandes",
     resize: "Redimensionner les panneaux",
     loading: "Chargement du portfolio…",
     source: "Markdown synchronisé",
@@ -38,12 +33,7 @@ const text = {
     send: "Send",
     inference: "inference running",
     unavailable: "The assistant is temporarily unavailable.",
-    terminal: "CLI portfolio",
     panelSwitcher: "Choose how to explore my profile",
-    chatHint: "Ask a question",
-    chatTab: "AI assistant",
-    mobileChatTab: "Assistant",
-    terminalHint: "Explore commands",
     resize: "Resize panels",
     loading: "Loading portfolio…",
     source: "Markdown synchronized",
@@ -55,12 +45,7 @@ const text = {
     send: "Enviar",
     inference: "inferencia en curso",
     unavailable: "El asistente no está disponible temporalmente.",
-    terminal: "Portfolio CLI",
     panelSwitcher: "Elige cómo descubrir mi perfil",
-    chatHint: "Hacer una pregunta",
-    chatTab: "Asistente IA",
-    mobileChatTab: "Asistente",
-    terminalHint: "Explorar los comandos",
     resize: "Redimensionar paneles",
     loading: "Cargando portfolio…",
     source: "Markdown sincronizado",
@@ -114,6 +99,8 @@ export default function App() {
   const resizeFrameRef = useRef<number | null>(null);
   const pendingPointerXRef = useRef(0);
   const copy = text[language];
+  const assistantTab = getLocalizedText(config.tabs.assistant, language, config.assistant.uri);
+  const terminalTab = getLocalizedText(config.tabs.terminal, language, config.portfolioLabel);
   const suggestions = config.suggestions[language].length ? config.suggestions[language] : [...copy.examples];
 
   useEffect(() => {
@@ -232,13 +219,13 @@ export default function App() {
       <header className="mobile-header">
       <span className="mobile-identity">{config.person.firstName}</span>
       <nav className="mobile-switch" aria-label={copy.panelSwitcher}>
-        <button type="button" className={activePanel === "chat" ? "active" : ""} aria-label={`${copy.chatTab} : ${copy.chatHint}`} aria-pressed={activePanel === "chat"} aria-controls="chat-panel" onClick={() => setActivePanel("chat")}>
+        <button type="button" className={activePanel === "chat" ? "active" : ""} aria-label={assistantTab} aria-pressed={activePanel === "chat"} aria-controls="chat-panel" onClick={() => setActivePanel("chat")}>
           <span className="mobile-switch-icon"><ChatIcon /></span>
-          <span className="mobile-switch-title">{copy.mobileChatTab}</span>
+          <span className="mobile-switch-title">{assistantTab}</span>
         </button>
-        <button type="button" className={activePanel === "terminal" ? "active" : ""} aria-label={`${copy.terminal} : ${copy.terminalHint}`} aria-pressed={activePanel === "terminal"} aria-controls="terminal-panel" onClick={() => setActivePanel("terminal")}>
+        <button type="button" className={activePanel === "terminal" ? "active" : ""} aria-label={terminalTab} aria-pressed={activePanel === "terminal"} aria-controls="terminal-panel" onClick={() => setActivePanel("terminal")}>
           <span className="mobile-switch-icon"><TerminalIcon /></span>
-          <span className="mobile-switch-title">CLI</span>
+          <span className="mobile-switch-title">{terminalTab}</span>
         </button>
       </nav>
       <select className="mobile-language" aria-label="Language" value={language} onChange={event => changeLanguage(event.target.value as Locale)}>
@@ -297,7 +284,7 @@ export default function App() {
 
       <section id="terminal-panel" className={`terminal-panel ${activePanel === "terminal" ? "mobile-active" : ""}`}>
         <header className="terminal-bar"><div className="window-dots"><i /><i /><i /></div><span>{config.portfolioLabel}</span></header>
-        {contentReady ? <iframe className="portfolio-frame" src="/portfolio-cli/index.html" title={copy.terminal} allow="clipboard-write" /> : <div className="terminal-loading">{copy.loading}</div>}
+        {contentReady ? <iframe className="portfolio-frame" src="/portfolio-cli/index.html" title={config.portfolioLabel} allow="clipboard-write" /> : <div className="terminal-loading">{copy.loading}</div>}
       </section>
     </main>
   );
