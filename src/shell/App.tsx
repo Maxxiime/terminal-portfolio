@@ -22,6 +22,11 @@ const text = {
     inference: "inférence en cours",
     unavailable: "L’assistant est momentanément indisponible.",
     terminal: "Portfolio CLI",
+    panelSwitcher: "Choisir une façon de découvrir mon profil",
+    chatHint: "Poser une question",
+    chatTab: "Assistant IA",
+    mobileChatTab: "Assistant",
+    terminalHint: "Explorer les commandes",
     resize: "Redimensionner les panneaux",
     loading: "Chargement du portfolio…",
     source: "Markdown synchronisé",
@@ -34,6 +39,11 @@ const text = {
     inference: "inference running",
     unavailable: "The assistant is temporarily unavailable.",
     terminal: "CLI portfolio",
+    panelSwitcher: "Choose how to explore my profile",
+    chatHint: "Ask a question",
+    chatTab: "AI assistant",
+    mobileChatTab: "Assistant",
+    terminalHint: "Explore commands",
     resize: "Resize panels",
     loading: "Loading portfolio…",
     source: "Markdown synchronized",
@@ -46,6 +56,11 @@ const text = {
     inference: "inferencia en curso",
     unavailable: "El asistente no está disponible temporalmente.",
     terminal: "Portfolio CLI",
+    panelSwitcher: "Elige cómo descubrir mi perfil",
+    chatHint: "Hacer una pregunta",
+    chatTab: "Asistente IA",
+    mobileChatTab: "Asistente",
+    terminalHint: "Explorar los comandos",
     resize: "Redimensionar paneles",
     loading: "Cargando portfolio…",
     source: "Markdown sincronizado",
@@ -55,6 +70,10 @@ const text = {
 
 function TerminalIcon() {
   return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 7 4.5 5L5 17l1.7 1.5 5.7-6.5-5.7-6.5L5 7Zm8 10h6v-2h-6v2Z" /></svg>;
+}
+
+function ChatIcon() {
+  return <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l-3 3V11.5A7.5 7.5 0 0 1 9.5 4h3a7.5 7.5 0 0 1 7.5 7.5Z" /><path d="M7 10h8M7 14h5" /></svg>;
 }
 
 function ArrowIcon() {
@@ -210,12 +229,24 @@ export default function App() {
 
   return (
     <main className="portfolio-shell" style={{ "--chat-width": `${chatWidth}%` } as CSSProperties}>
-      <nav className="mobile-switch" aria-label="Panel switcher">
-        <button className={activePanel === "chat" ? "active" : ""} onClick={() => setActivePanel("chat")}>{config.assistant.uri}</button>
-        <button className={activePanel === "terminal" ? "active" : ""} onClick={() => setActivePanel("terminal")}>{copy.terminal}</button>
+      <header className="mobile-header">
+      <span className="mobile-identity">{config.person.firstName}</span>
+      <nav className="mobile-switch" aria-label={copy.panelSwitcher}>
+        <button type="button" className={activePanel === "chat" ? "active" : ""} aria-label={`${copy.chatTab} : ${copy.chatHint}`} aria-pressed={activePanel === "chat"} aria-controls="chat-panel" onClick={() => setActivePanel("chat")}>
+          <span className="mobile-switch-icon"><ChatIcon /></span>
+          <span className="mobile-switch-title">{copy.mobileChatTab}</span>
+        </button>
+        <button type="button" className={activePanel === "terminal" ? "active" : ""} aria-label={`${copy.terminal} : ${copy.terminalHint}`} aria-pressed={activePanel === "terminal"} aria-controls="terminal-panel" onClick={() => setActivePanel("terminal")}>
+          <span className="mobile-switch-icon"><TerminalIcon /></span>
+          <span className="mobile-switch-title">CLI</span>
+        </button>
       </nav>
+      <select className="mobile-language" aria-label="Language" value={language} onChange={event => changeLanguage(event.target.value as Locale)}>
+        <option value="fr">FR</option><option value="en">EN</option><option value="es">ES</option>
+      </select>
+      </header>
 
-      <section className={`chat-panel ${activePanel === "chat" ? "mobile-active" : ""}`}>
+      <section id="chat-panel" className={`chat-panel ${messages.length === 0 ? "chat-empty" : ""} ${activePanel === "chat" ? "mobile-active" : ""}`}>
         <header className="panel-header">
           <div className="brand-mark"><TerminalIcon /></div>
           <div className="agent-title"><h1>{config.assistant.displayName}</h1><p><span className="status-dot" /> {copy.online}</p></div>
@@ -264,7 +295,7 @@ export default function App() {
         <span className="splitter-grip" aria-hidden="true"><i /><i /><i /></span>
       </div>
 
-      <section className={`terminal-panel ${activePanel === "terminal" ? "mobile-active" : ""}`}>
+      <section id="terminal-panel" className={`terminal-panel ${activePanel === "terminal" ? "mobile-active" : ""}`}>
         <header className="terminal-bar"><div className="window-dots"><i /><i /><i /></div><span>{config.portfolioLabel}</span></header>
         {contentReady ? <iframe className="portfolio-frame" src="/portfolio-cli/index.html" title={copy.terminal} allow="clipboard-write" /> : <div className="terminal-loading">{copy.loading}</div>}
       </section>
